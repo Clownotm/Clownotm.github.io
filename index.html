@@ -170,7 +170,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-06-07 23:07:28 / Modified: 23:29:46" itemprop="dateCreated datePublished" datetime="2021-06-07T23:07:28+08:00">2021-06-07</time>
+              <time title="Created: 2021-06-07 23:07:28 / Modified: 23:32:22" itemprop="dateCreated datePublished" datetime="2021-06-07T23:07:28+08:00">2021-06-07</time>
             </span>
 
           
@@ -220,7 +220,7 @@
 <p>DATA  —  可执行代码以外的部分（数据段+栈）占用的物理内存大小，单位kb。【简单理解，数据占用的内存，真正的该程序要求的数据空间，是真正在运行中要使用的】。</p>
 <p>CODE — 可执行代码占用的物理内存大小，单位kb。</p>
 <p>可以通过指令f进入 编排基本视图，这里列出了所有可在top基本视图中显示的进程字段，有带 “ * “ 的并且标注为大写字母的字段是可显示的，没有带 “ * “ 并且是小写字母的字段是不显示的。如果要在基本视图中显示CODE和DATA两个字段，可以移动上下键到这两个字段，然后按d键选择这两个字段，然后按q退出就可以。【提示：按f进入编排基本视图后，如果想进行进程字段显示顺序做修改，使用上下键移动到该字段，然后按右键（即选中该字段），然后上下键移动到需要的位置即可】</p>
-<p><img src="C:\Users\clown\AppData\Roaming\Typora\typora-user-images\image-20210527204228170.png" alt="image-20210527204228170"></p>
+<p><img src="mdimages/image-20210527204228170.png" alt="image-20210527204228170"></p>
 <hr>
 <h3 id="VIRT-virtual-memory-usage-虚拟内存"><a href="#VIRT-virtual-memory-usage-虚拟内存" class="headerlink" title="VIRT :  virtual memory usage 虚拟内存"></a>VIRT :  virtual memory usage 虚拟内存</h3><p>1、进程“需要的”虚拟内存大小，包括进程使用的库、代码、数据等</p>
 <p>注意：假如进程申请100m的内存，但实际只使用了10m,那么它会申请100m，而不是实际的使用量10m.</p>
@@ -243,63 +243,6 @@
 <h3 id="Linux查看物理CPU个数、核数、逻辑CPU个数"><a href="#Linux查看物理CPU个数、核数、逻辑CPU个数" class="headerlink" title="Linux查看物理CPU个数、核数、逻辑CPU个数"></a><strong>Linux查看物理CPU个数、核数、逻辑CPU个数</strong></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 总核数 = 物理CPU个数 X 每颗物理CPU的核数 </span><br><span class="line"># 总逻辑CPU数 = 物理CPU个数 X 每颗物理CPU的核数 X 超线程数</span><br><span class="line"></span><br><span class="line"># 查看物理CPU个数</span><br><span class="line">cat /proc/cpuinfo| grep &quot;physical id&quot;| sort| uniq| wc -l</span><br><span class="line"></span><br><span class="line"># 查看每个物理CPU中core的个数(即核数)</span><br><span class="line">cat /proc/cpuinfo| grep &quot;cpu cores&quot;| uniq</span><br><span class="line"></span><br><span class="line"># 查看逻辑CPU的个数</span><br><span class="line">cat /proc/cpuinfo| grep &quot;processor&quot;| wc -l</span><br><span class="line"># 查看CPU信息（型号）</span><br><span class="line">cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c</span><br></pre></td></tr></table></figure>
 
 
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/06/07/my-first-blog/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/06/07/my-first-blog/" class="post-title-link" itemprop="url">my-first-blog</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-06-07 23:03:40" itemprop="dateCreated datePublished" datetime="2021-06-07T23:03:40+08:00">2021-06-07</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
       
     </div>
 
@@ -450,7 +393,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

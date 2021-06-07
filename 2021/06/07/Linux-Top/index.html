@@ -28,9 +28,9 @@
 <meta property="og:description" content="Linux命令之Top 第一行，任务队列信息，同uptime命令的执行结果系统时间：11:32:32 运行时间：up 61 days, 23:26 当前登录用户：1 user 负载均衡（uptime）：load average:  1.35, 1.25, 1.29 ​                                  average后面的三个数分别是1分钟、5分钟、15分钟的负载情">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/2021/06/07/Linux-Top/mdimages/image-20210527113329108.png">
-<meta property="og:image" content="c:/Users/clown/AppData/Roaming/Typora/typora-user-images/image-20210527204228170.png">
+<meta property="og:image" content="http://example.com/2021/06/07/Linux-Top/mdimages/image-20210527204228170.png">
 <meta property="article:published_time" content="2021-06-07T15:07:28.000Z">
-<meta property="article:modified_time" content="2021-06-07T15:29:46.361Z">
+<meta property="article:modified_time" content="2021-06-07T15:32:22.453Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/2021/06/07/Linux-Top/mdimages/image-20210527113329108.png">
@@ -177,7 +177,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-06-07 23:07:28 / Modified: 23:29:46" itemprop="dateCreated datePublished" datetime="2021-06-07T23:07:28+08:00">2021-06-07</time>
+              <time title="Created: 2021-06-07 23:07:28 / Modified: 23:32:22" itemprop="dateCreated datePublished" datetime="2021-06-07T23:07:28+08:00">2021-06-07</time>
             </span>
 
           
@@ -227,7 +227,7 @@
 <p>DATA  —  可执行代码以外的部分（数据段+栈）占用的物理内存大小，单位kb。【简单理解，数据占用的内存，真正的该程序要求的数据空间，是真正在运行中要使用的】。</p>
 <p>CODE — 可执行代码占用的物理内存大小，单位kb。</p>
 <p>可以通过指令f进入 编排基本视图，这里列出了所有可在top基本视图中显示的进程字段，有带 “ * “ 的并且标注为大写字母的字段是可显示的，没有带 “ * “ 并且是小写字母的字段是不显示的。如果要在基本视图中显示CODE和DATA两个字段，可以移动上下键到这两个字段，然后按d键选择这两个字段，然后按q退出就可以。【提示：按f进入编排基本视图后，如果想进行进程字段显示顺序做修改，使用上下键移动到该字段，然后按右键（即选中该字段），然后上下键移动到需要的位置即可】</p>
-<p><img src="C:\Users\clown\AppData\Roaming\Typora\typora-user-images\image-20210527204228170.png" alt="image-20210527204228170"></p>
+<p><img src="mdimages/image-20210527204228170.png" alt="image-20210527204228170"></p>
 <hr>
 <h3 id="VIRT-virtual-memory-usage-虚拟内存"><a href="#VIRT-virtual-memory-usage-虚拟内存" class="headerlink" title="VIRT :  virtual memory usage 虚拟内存"></a>VIRT :  virtual memory usage 虚拟内存</h3><p>1、进程“需要的”虚拟内存大小，包括进程使用的库、代码、数据等</p>
 <p>注意：假如进程申请100m的内存，但实际只使用了10m,那么它会申请100m，而不是实际的使用量10m.</p>
@@ -264,8 +264,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/06/07/my-first-blog/" rel="prev" title="my-first-blog">
-      <i class="fa fa-chevron-left"></i> my-first-blog
+    <a href="/2021/06/07/hello-world/" rel="prev" title="Hello World">
+      <i class="fa fa-chevron-left"></i> Hello World
     </a></div>
       <div class="post-nav-item"></div>
     </div>
@@ -340,7 +340,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
