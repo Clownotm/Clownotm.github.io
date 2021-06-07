@@ -1,40 +1,330 @@
-extends includes/layout.pug
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
 
-block content
-    article#post
-        .post-header
-            .title= page.title
-            .container
-                time.button-hover.post-date #[i.fas.fa-calendar-alt.article-icon(aria-hidden="true")] #[=__('post.posted')] #[=date(page['date'], config.date_format)] | #[=__('post.modified')] #[=date(page['updated'], config.date_format)]
-                //time.button-hover.post-date #[i.fas.fa-calendar-alt.article-icon(aria-hidden="true")] #[=__('post.modified')] #[=date(page['updated'], config.date_format)]
-                .button-hover.categories
-                    each categories,index in page.categories.data
-                        i.fa.fa-inbox.article-icon(aria-hidden="true")
-                        a.link-a(href=url_for(categories.path)) #[=categories.name]
-                        if(index < page.categories.data.length - 1)
-                            i.fa.fa-angle-right(style="margin: 0 8px;")
-                .button-hover.tags
-                    each tags,index in page.tags.data
-                        i.fa.fa-tag.article-icon(aria-hidden="true")
-                        a.link-a(href=url_for(tags.path)) #[=tags.name]
-                        if(index < page.tags.data.length - 1)
-                            span &nbsp;|&nbsp;
-        .main-content!= page.content
-        if (theme.post_copyright && theme.post_copyright.enable)
-            .post-copyright
-                .post-copyright-author
-                    span.post-copyright-meta= _p('post.copyright.author') + ": "
-                    span.post-copyright-info
-                        - let mailto = `mailto:${config.email}`
-                        a(href=mailto) #[=config.author]
-                .post-copyright-type
-                    span.post-copyright-meta= _p('post.copyright.link') + ": "
-                    span.post-copyright-info
-                        a(href=url_for(page.permalink)) #[=page.permalink]
-                .post-copyright-notice
-                    span.post-copyright-meta= _p('post.copyright.copyright_notice') + ": "
-                    span.post-copyright-info!= _p('post.copyright.copyright_content', theme.post_copyright.license_url, theme.post_copyright.license, config.url, config.title)
-        if (theme.comments.enable)
-            include ./includes/comments/index.pug
-    include includes/pagination.pug
-    //div!= paginator()
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{&quot;hostname&quot;:&quot;example.com&quot;,&quot;root&quot;:&quot;&#x2F;&quot;,&quot;images&quot;:&quot;&#x2F;images&quot;,&quot;scheme&quot;:&quot;Muse&quot;,&quot;version&quot;:&quot;8.5.0&quot;,&quot;exturl&quot;:false,&quot;sidebar&quot;:{&quot;position&quot;:&quot;left&quot;,&quot;display&quot;:&quot;post&quot;,&quot;padding&quot;:18,&quot;offset&quot;:12},&quot;copycode&quot;:false,&quot;bookmark&quot;:{&quot;enable&quot;:false,&quot;color&quot;:&quot;#222&quot;,&quot;save&quot;:&quot;auto&quot;},&quot;fancybox&quot;:false,&quot;mediumzoom&quot;:false,&quot;lazyload&quot;:false,&quot;pangu&quot;:false,&quot;comments&quot;:{&quot;style&quot;:&quot;tabs&quot;,&quot;active&quot;:null,&quot;storage&quot;:true,&quot;lazyload&quot;:false,&quot;nav&quot;:null},&quot;motion&quot;:{&quot;enable&quot;:true,&quot;async&quot;:false,&quot;transition&quot;:{&quot;post_block&quot;:&quot;fadeIn&quot;,&quot;post_header&quot;:&quot;fadeInDown&quot;,&quot;post_body&quot;:&quot;fadeInDown&quot;,&quot;coll_header&quot;:&quot;fadeInLeft&quot;,&quot;sidebar&quot;:&quot;fadeInUp&quot;}},&quot;prism&quot;:false,&quot;i18n&quot;:{&quot;placeholder&quot;:&quot;Searching...&quot;,&quot;empty&quot;:&quot;We didn&#39;t find any results for the search: ${query}&quot;,&quot;hits_time&quot;:&quot;${hits} results found in ${time} ms&quot;,&quot;hits&quot;:&quot;${hits} results found&quot;}}</script><script src="/js/config.js"></script>
+<meta name="description" content="Linux命令之Top 第一行，任务队列信息，同uptime命令的执行结果系统时间：11:32:32 运行时间：up 61 days, 23:26 当前登录用户：1 user 负载均衡（uptime）：load average:  1.35, 1.25, 1.29 ​                                  average后面的三个数分别是1分钟、5分钟、15分钟的负载情">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux-Top">
+<meta property="og:url" content="http://example.com/2021/06/07/Linux-Top/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Linux命令之Top 第一行，任务队列信息，同uptime命令的执行结果系统时间：11:32:32 运行时间：up 61 days, 23:26 当前登录用户：1 user 负载均衡（uptime）：load average:  1.35, 1.25, 1.29 ​                                  average后面的三个数分别是1分钟、5分钟、15分钟的负载情">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2021/06/07/Linux-Top/mdimages/image-20210527113329108.png">
+<meta property="og:image" content="http://example.com/2021/06/07/Linux-Top/mdimages/image-20210527204228170.png">
+<meta property="article:published_time" content="2021-06-07T15:07:28.000Z">
+<meta property="article:modified_time" content="2021-06-07T15:32:22.453Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/06/07/Linux-Top/mdimages/image-20210527113329108.png">
+
+
+<link rel="canonical" href="http://example.com/2021/06/07/Linux-Top/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{&quot;sidebar&quot;:&quot;&quot;,&quot;isHome&quot;:false,&quot;isPost&quot;:true,&quot;lang&quot;:&quot;en&quot;,&quot;comments&quot;:true,&quot;permalink&quot;:&quot;http:&#x2F;&#x2F;example.com&#x2F;2021&#x2F;06&#x2F;07&#x2F;Linux-Top&#x2F;&quot;,&quot;path&quot;:&quot;2021&#x2F;06&#x2F;07&#x2F;Linux-Top&#x2F;&quot;,&quot;title&quot;:&quot;Linux-Top&quot;}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">&quot;&quot;</script>
+<title>Linux-Top | Hexo</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hexo</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux%E5%91%BD%E4%BB%A4%E4%B9%8BTop"><span class="nav-number">1.</span> <span class="nav-text">Linux命令之Top</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E8%A1%8C%EF%BC%8C%E4%BB%BB%E5%8A%A1%E9%98%9F%E5%88%97%E4%BF%A1%E6%81%AF%EF%BC%8C%E5%90%8Cuptime%E5%91%BD%E4%BB%A4%E7%9A%84%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">1.0.1.</span> <span class="nav-text">第一行，任务队列信息，同uptime命令的执行结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E8%A1%8C%EF%BC%8CTasks-%E4%BB%BB%E5%8A%A1%EF%BC%88%E8%BF%9B%E7%A8%8B%EF%BC%89"><span class="nav-number">1.0.2.</span> <span class="nav-text">第二行，Tasks - 任务（进程）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E8%A1%8C%EF%BC%8Ccpu%E7%8A%B6%E6%80%81%E4%BF%A1%E6%81%AF"><span class="nav-number">1.0.3.</span> <span class="nav-text">第三行，cpu状态信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E8%A1%8C%EF%BC%8C%E5%86%85%E5%AD%98%E7%8A%B6%E6%80%81-Mem"><span class="nav-number">1.0.4.</span> <span class="nav-text">第四行，内存状态 Mem</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%BA%94%E8%A1%8C%EF%BC%8Cswap%E4%BA%A4%E6%8D%A2%E5%88%86%E5%8C%BA%E4%BF%A1%E6%81%AF"><span class="nav-number">1.0.5.</span> <span class="nav-text">第五行，swap交换分区信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E5%85%AD%E8%A1%8C%EF%BC%8C%E7%A9%BA%E8%A1%8C"><span class="nav-number">1.0.6.</span> <span class="nav-text">第六行，空行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%83%E8%A1%8C%E4%BB%A5%E4%B8%8B%EF%BC%9A%E5%90%84%E8%BF%9B%E7%A8%8B%EF%BC%88%E4%BB%BB%E5%8A%A1%EF%BC%89%E7%9A%84%E7%8A%B6%E6%80%81%E7%9B%91%E6%8E%A7"><span class="nav-number">1.0.7.</span> <span class="nav-text">第七行以下：各进程（任务）的状态监控</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VIRT-virtual-memory-usage-%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="nav-number">1.0.8.</span> <span class="nav-text">VIRT :  virtual memory usage 虚拟内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RES-resident-memory-usage-%E5%B8%B8%E9%A9%BB%E5%86%85%E5%AD%98%EF%BC%88%E5%8D%95%E4%BD%8Dkb%EF%BC%89"><span class="nav-number">1.0.9.</span> <span class="nav-text">RES  :  resident memory usage 常驻内存（单位kb）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SHR-shared-memory-%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98"><span class="nav-number">1.0.10.</span> <span class="nav-text">SHR : shared memory 共享内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#top%E8%BF%90%E8%A1%8C%E4%B8%AD%E5%8F%AF%E4%BB%A5%E9%80%9A%E8%BF%87%E5%86%85%E9%83%A8%E5%91%BD%E4%BB%A4%E5%AF%B9%E8%BF%9B%E7%A8%8B%E7%9A%84%E6%98%BE%E7%A4%BA%E6%96%B9%E5%BC%8F%E8%BF%9B%E8%A1%8C%E6%8E%A7%E5%88%B6%EF%BC%9A%E5%86%85%E9%83%A8%E5%91%BD%E4%BB%A4%E5%A6%82%E4%B8%8B"><span class="nav-number">1.0.11.</span> <span class="nav-text">top运行中可以通过内部命令对进程的显示方式进行控制：内部命令如下</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#top%E5%91%BD%E4%BB%A4%E7%9A%84%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-number">1.0.12.</span> <span class="nav-text">top命令的使用方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux%E6%9F%A5%E7%9C%8B%E7%89%A9%E7%90%86CPU%E4%B8%AA%E6%95%B0%E3%80%81%E6%A0%B8%E6%95%B0%E3%80%81%E9%80%BB%E8%BE%91CPU%E4%B8%AA%E6%95%B0"><span class="nav-number">1.0.13.</span> <span class="nav-text">Linux查看物理CPU个数、核数、逻辑CPU个数</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/06/07/Linux-Top/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux-Top
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2021-06-07 23:07:28 / Modified: 23:32:22" itemprop="dateCreated datePublished" datetime="2021-06-07T23:07:28+08:00">2021-06-07</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Linux命令之Top"><a href="#Linux命令之Top" class="headerlink" title="Linux命令之Top"></a>Linux命令之Top</h1><p><img src="mdimages/image-20210527113329108.png" alt="image-20210527113329108"></p>
+<h3 id="第一行，任务队列信息，同uptime命令的执行结果"><a href="#第一行，任务队列信息，同uptime命令的执行结果" class="headerlink" title="第一行，任务队列信息，同uptime命令的执行结果"></a>第一行，任务队列信息，同uptime命令的执行结果</h3><p>系统时间：11:32:32</p>
+<p>运行时间：up 61 days, 23:26</p>
+<p>当前登录用户：1 user</p>
+<p>负载均衡（uptime）：load average:  1.35, 1.25, 1.29</p>
+<p>​                                  average后面的三个数分别是1分钟、5分钟、15分钟的负载情况。</p>
+<p>（load average数据是每隔5秒检查一次活跃的进程数，然后按特定算法计算出的数值。如果这个数除以逻辑CPU的数量，结果高于5，就表明系统在超负荷运转）</p>
+<h3 id="第二行，Tasks-任务（进程）"><a href="#第二行，Tasks-任务（进程）" class="headerlink" title="第二行，Tasks - 任务（进程）"></a>第二行，Tasks - 任务（进程）</h3><p>总进程：231total，运行：2 running，休眠：229 sleeping，停止：0 stopped，僵尸进程：0 zombie</p>
+<h3 id="第三行，cpu状态信息"><a href="#第三行，cpu状态信息" class="headerlink" title="第三行，cpu状态信息"></a>第三行，cpu状态信息</h3><p>15.2%us【user space】— 用户空间占用CPU的百分比。</p>
+<p>4.9%sy 【sysctl】— 内核空间占用CPU的百分比。</p>
+<p>0.0%ni  — 改变过优先级的进程占用CPU的百分比。</p>
+<p>79.8%id 【idolt】 — 空闲CPU百分比。</p>
+<p>0.0%wa 【wait】 — IO等待占用CPU的百分比。</p>
+<p>0.0%hi 【Hardware IRQ】— 硬中断占用CPU的百分比。</p>
+<p>0.2%si 【Software Interrupts】— 软中断占用CPU的百分比。</p>
+<p>0.0%st 【】</p>
+<h3 id="第四行，内存状态-Mem"><a href="#第四行，内存状态-Mem" class="headerlink" title="第四行，内存状态 Mem"></a>第四行，内存状态 Mem</h3><p>8060540k total  总内存大小, 6989544k used 已使用内存大小, 1070996k free 空闲内存大小, 1143720k buffers 【缓存的内存量】</p>
+<h3 id="第五行，swap交换分区信息"><a href="#第五行，swap交换分区信息" class="headerlink" title="第五行，swap交换分区信息"></a>第五行，swap交换分区信息</h3><p>8208380k total 总内存大小, 942352k used 已使用内存大小,  7266028k free 空闲内存大小, 3101300k cached 【缓冲的交换区总量】</p>
+<p>补充说明：可用内存 =  free + buffer + cached</p>
+<p>在对内存监控中，时刻注意swap 交换区的 used，如果这个数值在不断的变化，说明内核在不断进行内存和swap的数据交换，表明真正的内存不够用了。</p>
+<h3 id="第六行，空行"><a href="#第六行，空行" class="headerlink" title="第六行，空行"></a>第六行，空行</h3><h3 id="第七行以下：各进程（任务）的状态监控"><a href="#第七行以下：各进程（任务）的状态监控" class="headerlink" title="第七行以下：各进程（任务）的状态监控"></a>第七行以下：各进程（任务）的状态监控</h3><p>PID —- 进程id</p>
+<p>USER — 进程所有者。</p>
+<p>PR — 进程优先级。</p>
+<p>NI — nice值，负值表示高优先级，正值表示低优先级。</p>
+<p>VIRT — 进程使用的虚拟内存总量，单位kb。VIRT = SWAP + RES。</p>
+<p>RES — 进程使用的、未被换出的物理内存大小，单位kb。RES = CODE + DATA。</p>
+<p>SHR — 共享内存大小，单位kb。</p>
+<p>S — 进程状态。D代表不可中断的睡眠状态；R代表运行；S代表睡眠；T代表跟踪/停止；Z代表僵尸进程。</p>
+<p>%CPU — 上次更新到现在CPU时间占用百分比。</p>
+<p>%MEM — 进程使用的物理内存百分比。</p>
+<p>TIME+ — 进程使用的CPU时间总计，单位1/100 秒。</p>
+<p>COMMAND — 进程名称（命令名/命令行）。</p>
+<p>————————————————————–以下信息默认没展示———————————————————————</p>
+<p>DATA  —  可执行代码以外的部分（数据段+栈）占用的物理内存大小，单位kb。【简单理解，数据占用的内存，真正的该程序要求的数据空间，是真正在运行中要使用的】。</p>
+<p>CODE — 可执行代码占用的物理内存大小，单位kb。</p>
+<p>可以通过指令f进入 编排基本视图，这里列出了所有可在top基本视图中显示的进程字段，有带 “ * “ 的并且标注为大写字母的字段是可显示的，没有带 “ * “ 并且是小写字母的字段是不显示的。如果要在基本视图中显示CODE和DATA两个字段，可以移动上下键到这两个字段，然后按d键选择这两个字段，然后按q退出就可以。【提示：按f进入编排基本视图后，如果想进行进程字段显示顺序做修改，使用上下键移动到该字段，然后按右键（即选中该字段），然后上下键移动到需要的位置即可】</p>
+<p><img src="mdimages/image-20210527204228170.png" alt="image-20210527204228170"></p>
+<hr>
+<h3 id="VIRT-virtual-memory-usage-虚拟内存"><a href="#VIRT-virtual-memory-usage-虚拟内存" class="headerlink" title="VIRT :  virtual memory usage 虚拟内存"></a>VIRT :  virtual memory usage 虚拟内存</h3><p>1、进程“需要的”虚拟内存大小，包括进程使用的库、代码、数据等</p>
+<p>注意：假如进程申请100m的内存，但实际只使用了10m,那么它会申请100m，而不是实际的使用量10m.</p>
+<h3 id="RES-resident-memory-usage-常驻内存（单位kb）"><a href="#RES-resident-memory-usage-常驻内存（单位kb）" class="headerlink" title="RES  :  resident memory usage 常驻内存（单位kb）"></a>RES  :  resident memory usage 常驻内存（单位kb）</h3><p>1、进程当前使用的内存大小，但不包括swap out</p>
+<p>2、包含其他进程的共享</p>
+<p>3、如果申请100m的内存，实际使用10m，它只增长10m，与VIRT相反</p>
+<p>补充说明：<strong>当某进程向OS请求内存发现不足时，OS会把内存中暂时不用的数据交换出去，放在SWAP分区中，这个过程称为SWAP OUT</strong></p>
+<h3 id="SHR-shared-memory-共享内存"><a href="#SHR-shared-memory-共享内存" class="headerlink" title="SHR : shared memory 共享内存"></a>SHR : shared memory 共享内存</h3><p>1、除了自身进程的共享内存，也包括其他进行的共享内存</p>
+<p>2、虽然进程只使用了几个共享库的函数，但它包含了整个共享库的大小</p>
+<p>3、计算某个进程所占物理内存大小公式：RES - SHR</p>
+<p>4、swap out后，它将会降下来</p>
+<h3 id="top运行中可以通过内部命令对进程的显示方式进行控制：内部命令如下"><a href="#top运行中可以通过内部命令对进程的显示方式进行控制：内部命令如下" class="headerlink" title="top运行中可以通过内部命令对进程的显示方式进行控制：内部命令如下"></a>top运行中可以通过内部命令对进程的显示方式进行控制：内部命令如下</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">s ：改变画面更新频率。</span><br><span class="line"></span><br><span class="line">l ：关闭或开启第一行top信息。</span><br><span class="line"></span><br><span class="line">t ：关闭或开启第二行Tasks和第三行Cpus信息（需要连按3次才可以关闭）。</span><br><span class="line"></span><br><span class="line">m ：关闭或开启第四行Mem和第五行Swap信息（需要连按3次才可以关闭）。</span><br><span class="line"></span><br><span class="line">N ：以PID的大小进行降序排序。</span><br><span class="line"></span><br><span class="line">P：以CPU占用率大小进行降序排序。</span><br><span class="line"></span><br><span class="line">M：以内存占用率大小进行降序排序。</span><br><span class="line"></span><br><span class="line">h：显示帮助</span><br><span class="line"></span><br><span class="line">n：设置在进程列表所显示进程的数量</span><br><span class="line"></span><br><span class="line">q：退出top</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="top命令的使用方法"><a href="#top命令的使用方法" class="headerlink" title="top命令的使用方法"></a>top命令的使用方法</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">使用格式：top [-] [p] [S] [s] [i] [c]</span><br><span class="line"></span><br><span class="line">参数说明：</span><br><span class="line"></span><br><span class="line">p：通过指定监控进程ID来显示某个进程的状态。top -p 进程ID</span><br><span class="line"></span><br><span class="line">S：指定累计模式。</span><br><span class="line"></span><br><span class="line">s：使top命令在安全模式中运行。这将去除交互命令所带来的潜在危险。</span><br><span class="line"></span><br><span class="line">i：使top不显示任何闲置或者僵尸进程。</span><br><span class="line"></span><br><span class="line">c：显示整个命令行而不只是显示命令名称。</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="Linux查看物理CPU个数、核数、逻辑CPU个数"><a href="#Linux查看物理CPU个数、核数、逻辑CPU个数" class="headerlink" title="Linux查看物理CPU个数、核数、逻辑CPU个数"></a><strong>Linux查看物理CPU个数、核数、逻辑CPU个数</strong></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 总核数 = 物理CPU个数 X 每颗物理CPU的核数 </span><br><span class="line"># 总逻辑CPU数 = 物理CPU个数 X 每颗物理CPU的核数 X 超线程数</span><br><span class="line"></span><br><span class="line"># 查看物理CPU个数</span><br><span class="line">cat /proc/cpuinfo| grep &quot;physical id&quot;| sort| uniq| wc -l</span><br><span class="line"></span><br><span class="line"># 查看每个物理CPU中core的个数(即核数)</span><br><span class="line">cat /proc/cpuinfo| grep &quot;cpu cores&quot;| uniq</span><br><span class="line"></span><br><span class="line"># 查看逻辑CPU的个数</span><br><span class="line">cat /proc/cpuinfo| grep &quot;processor&quot;| wc -l</span><br><span class="line"># 查看CPU信息（型号）</span><br><span class="line">cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/06/07/hello-world/" rel="prev" title="Hello World">
+                  <i class="fa fa-chevron-left"></i> Hello World
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
