@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Hello-World</title>
+    <url>/2021/06/08/Hello-World/</url>
+    <content><![CDATA[<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="创建一个文档"><a href="#创建一个文档" class="headerlink" title="创建一个文档"></a>创建一个文档</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="创建一个页面"><a href="#创建一个页面" class="headerlink" title="创建一个页面"></a>创建一个页面</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new page <span class="string">&quot;new my pageName&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="生成静态页面至public目录"><a href="#生成静态页面至public目录" class="headerlink" title="生成静态页面至public目录"></a>生成静态页面至public目录</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<h3 id="部署到GitHub"><a href="#部署到GitHub" class="headerlink" title="部署到GitHub"></a>部署到GitHub</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<h3 id="清理public目录的内容"><a href="#清理public目录的内容" class="headerlink" title="清理public目录的内容"></a>清理public目录的内容</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo clean</span><br></pre></td></tr></table></figure>
+
+<h3 id="指令缩写"><a href="#指令缩写" class="headerlink" title="指令缩写"></a>指令缩写</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo n    （hexo new）</span><br><span class="line">$ hexo g    （hexo generate）</span><br><span class="line">$ hexo d    （hexo deploy）</span><br></pre></td></tr></table></figure>
+
+<h3 id="组合指令"><a href="#组合指令" class="headerlink" title="组合指令"></a>组合指令</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo s -g <span class="comment">#生成并本地预览</span></span><br><span class="line">$ hexo d -g <span class="comment">#生成并上传</span></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>Hexo常用指令</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Linux-Top</title>
     <url>/2021/06/08/Linux-Top/</url>
     <content><![CDATA[<h1 id="Linux命令之Top"><a href="#Linux命令之Top" class="headerlink" title="Linux命令之Top"></a>Linux命令之Top</h1><p><img src="/mdimages/image-20210527113329108.png" alt="image-20210527113329108"></p>
@@ -69,33 +96,6 @@
       </categories>
       <tags>
         <tag>linux</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello-World</title>
-    <url>/2021/06/08/Hello-World/</url>
-    <content><![CDATA[<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="创建一个文档"><a href="#创建一个文档" class="headerlink" title="创建一个文档"></a>创建一个文档</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="创建一个页面"><a href="#创建一个页面" class="headerlink" title="创建一个页面"></a>创建一个页面</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new page <span class="string">&quot;new my pageName&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="生成静态页面至public目录"><a href="#生成静态页面至public目录" class="headerlink" title="生成静态页面至public目录"></a>生成静态页面至public目录</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<h3 id="部署到GitHub"><a href="#部署到GitHub" class="headerlink" title="部署到GitHub"></a>部署到GitHub</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span>
-
-<h3 id="清理public目录的内容"><a href="#清理public目录的内容" class="headerlink" title="清理public目录的内容"></a>清理public目录的内容</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo clean</span><br></pre></td></tr></table></figure>
-
-<h3 id="指令缩写"><a href="#指令缩写" class="headerlink" title="指令缩写"></a>指令缩写</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo n    （hexo new）</span><br><span class="line">$ hexo g    （hexo generate）</span><br><span class="line">$ hexo d    （hexo deploy）</span><br></pre></td></tr></table></figure>
-
-<h3 id="组合指令"><a href="#组合指令" class="headerlink" title="组合指令"></a>组合指令</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo s -g <span class="comment">#生成并本地预览</span></span><br><span class="line">$ hexo d -g <span class="comment">#生成并上传</span></span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>Hexo常用指令</category>
-      </categories>
-      <tags>
-        <tag>hexo</tag>
       </tags>
   </entry>
   <entry>
