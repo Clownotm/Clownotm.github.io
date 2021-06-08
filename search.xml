@@ -67,6 +67,9 @@
       <categories>
         <category>Linux命令</category>
       </categories>
+      <tags>
+        <tag>linux</tag>
+      </tags>
   </entry>
   <entry>
     <title>Hello-World</title>
@@ -91,6 +94,9 @@
       <categories>
         <category>Hexo常用指令</category>
       </categories>
+      <tags>
+        <tag>hexo</tag>
+      </tags>
   </entry>
   <entry>
     <title>test</title>
@@ -99,5 +105,8 @@
       <categories>
         <category>Linux命令</category>
       </categories>
+      <tags>
+        <tag>linux</tag>
+      </tags>
   </entry>
 </search>
