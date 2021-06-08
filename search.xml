@@ -69,7 +69,7 @@
       </categories>
   </entry>
   <entry>
-    <title>Hello World</title>
+    <title>Hello-World</title>
     <url>/2021/06/08/Hello-World/</url>
     <content><![CDATA[<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="创建一个文档"><a href="#创建一个文档" class="headerlink" title="创建一个文档"></a>创建一个文档</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
 
