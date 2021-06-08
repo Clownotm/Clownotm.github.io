@@ -10,6 +10,8 @@
 <p>负载均衡（uptime）：load average:  1.35, 1.25, 1.29</p>
 <p>​                                  average后面的三个数分别是1分钟、5分钟、15分钟的负载情况。</p>
 <p>（load average数据是每隔5秒检查一次活跃的进程数，然后按特定算法计算出的数值。如果这个数除以逻辑CPU的数量，结果高于5，就表明系统在超负荷运转）</p>
+<span id="more"></span>
+
 <h3 id="第二行，Tasks-任务（进程）"><a href="#第二行，Tasks-任务（进程）" class="headerlink" title="第二行，Tasks - 任务（进程）"></a>第二行，Tasks - 任务（进程）</h3><p>总进程：231total，运行：2 running，休眠：229 sleeping，停止：0 stopped，僵尸进程：0 zombie</p>
 <h3 id="第三行，cpu状态信息"><a href="#第三行，cpu状态信息" class="headerlink" title="第三行，cpu状态信息"></a>第三行，cpu状态信息</h3><p>15.2%us【user space】— 用户空间占用CPU的百分比。</p>
 <p>4.9%sy 【sysctl】— 内核空间占用CPU的百分比。</p>
@@ -76,6 +78,8 @@
 <h3 id="生成静态页面至public目录"><a href="#生成静态页面至public目录" class="headerlink" title="生成静态页面至public目录"></a>生成静态页面至public目录</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
 
 <h3 id="部署到GitHub"><a href="#部署到GitHub" class="headerlink" title="部署到GitHub"></a>部署到GitHub</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
 
 <h3 id="清理public目录的内容"><a href="#清理public目录的内容" class="headerlink" title="清理public目录的内容"></a>清理public目录的内容</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo clean</span><br></pre></td></tr></table></figure>
 
