@@ -20,8 +20,8 @@
   </entry>
   <entry>
     <title>Linux-Top</title>
-    <url>/2021/06/07/Linux-Top/</url>
-    <content><![CDATA[<h1 id="Linux命令之Top"><a href="#Linux命令之Top" class="headerlink" title="Linux命令之Top"></a>Linux命令之Top</h1><p><img src="mdimages/image-20210527113329108.png" alt="image-20210527113329108"></p>
+    <url>/2021/06/08/Linux-Top/</url>
+    <content><![CDATA[<h1 id="Linux命令之Top"><a href="#Linux命令之Top" class="headerlink" title="Linux命令之Top"></a>Linux命令之Top</h1><p><img src="/mdimages/image-20210527113329108.png" alt="image-20210527113329108"></p>
 <h3 id="第一行，任务队列信息，同uptime命令的执行结果"><a href="#第一行，任务队列信息，同uptime命令的执行结果" class="headerlink" title="第一行，任务队列信息，同uptime命令的执行结果"></a>第一行，任务队列信息，同uptime命令的执行结果</h3><p>系统时间：11:32:32</p>
 <p>运行时间：up 61 days, 23:26</p>
 <p>当前登录用户：1 user</p>
@@ -53,11 +53,11 @@
 <p>%MEM — 进程使用的物理内存百分比。</p>
 <p>TIME+ — 进程使用的CPU时间总计，单位1/100 秒。</p>
 <p>COMMAND — 进程名称（命令名/命令行）。</p>
-<p>————————————————————–以下信息默认没展示———————————————————————</p>
+<p>以下信息默认没展示:</p>
 <p>DATA  —  可执行代码以外的部分（数据段+栈）占用的物理内存大小，单位kb。【简单理解，数据占用的内存，真正的该程序要求的数据空间，是真正在运行中要使用的】。</p>
 <p>CODE — 可执行代码占用的物理内存大小，单位kb。</p>
 <p>可以通过指令f进入 编排基本视图，这里列出了所有可在top基本视图中显示的进程字段，有带 “ * “ 的并且标注为大写字母的字段是可显示的，没有带 “ * “ 并且是小写字母的字段是不显示的。如果要在基本视图中显示CODE和DATA两个字段，可以移动上下键到这两个字段，然后按d键选择这两个字段，然后按q退出就可以。【提示：按f进入编排基本视图后，如果想进行进程字段显示顺序做修改，使用上下键移动到该字段，然后按右键（即选中该字段），然后上下键移动到需要的位置即可】</p>
-<p><img src="mdimages/image-20210527204228170.png" alt="image-20210527204228170"></p>
+<p><img src="/mdimages/image-20210527204228170.png" alt="image-20210527204228170"></p>
 <hr>
 <h3 id="VIRT-virtual-memory-usage-虚拟内存"><a href="#VIRT-virtual-memory-usage-虚拟内存" class="headerlink" title="VIRT :  virtual memory usage 虚拟内存"></a>VIRT :  virtual memory usage 虚拟内存</h3><p>1、进程“需要的”虚拟内存大小，包括进程使用的库、代码、数据等</p>
 <p>注意：假如进程申请100m的内存，但实际只使用了10m,那么它会申请100m，而不是实际的使用量10m.</p>
@@ -80,5 +80,8 @@
 <h3 id="Linux查看物理CPU个数、核数、逻辑CPU个数"><a href="#Linux查看物理CPU个数、核数、逻辑CPU个数" class="headerlink" title="Linux查看物理CPU个数、核数、逻辑CPU个数"></a><strong>Linux查看物理CPU个数、核数、逻辑CPU个数</strong></h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># 总核数 = 物理CPU个数 X 每颗物理CPU的核数 </span><br><span class="line"># 总逻辑CPU数 = 物理CPU个数 X 每颗物理CPU的核数 X 超线程数</span><br><span class="line"></span><br><span class="line"># 查看物理CPU个数</span><br><span class="line">cat /proc/cpuinfo| grep &quot;physical id&quot;| sort| uniq| wc -l</span><br><span class="line"></span><br><span class="line"># 查看每个物理CPU中core的个数(即核数)</span><br><span class="line">cat /proc/cpuinfo| grep &quot;cpu cores&quot;| uniq</span><br><span class="line"></span><br><span class="line"># 查看逻辑CPU的个数</span><br><span class="line">cat /proc/cpuinfo| grep &quot;processor&quot;| wc -l</span><br><span class="line"># 查看CPU信息（型号）</span><br><span class="line">cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c</span><br></pre></td></tr></table></figure>
 
 ]]></content>
+      <categories>
+        <category>Linux命令</category>
+      </categories>
   </entry>
 </search>
