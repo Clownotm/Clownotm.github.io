@@ -165,23 +165,97 @@
       </tags>
   </entry>
   <entry>
-    <title>test</title>
-    <url>/2021/06/08/test/</url>
+    <title>栈上分配和TLAB</title>
+    <url>/2021/06/09/%E6%A0%88%E4%B8%8A%E5%88%86%E9%85%8D%E5%92%8CTLAB/</url>
     <content><![CDATA[
-        <h1 id="一、测试"   >
-          <a href="#一、测试" class="heading-link"><i class="fas fa-link"></i></a><a href="#一、测试" class="headerlink" title="一、测试"></a>一、测试</h1>
+        <h2 id="关于栈上分配和TLAB的理解"   >
+          <a href="#关于栈上分配和TLAB的理解" class="heading-link"><i class="fas fa-link"></i></a><a href="#关于栈上分配和TLAB的理解" class="headerlink" title="关于栈上分配和TLAB的理解"></a><strong>关于栈上分配和TLAB的理解</strong></h2>
       
-        <h2 id="二、测试"   >
-          <a href="#二、测试" class="heading-link"><i class="fas fa-link"></i></a><a href="#二、测试" class="headerlink" title="二、测试"></a>二、测试</h2>
+        <h4 id="前言"   >
+          <a href="#前言" class="heading-link"><i class="fas fa-link"></i></a><a href="#前言" class="headerlink" title="前言"></a>前言</h4>
+      <p>在java程序中，new出来的对象时分配在堆空间中的，但是实际的情况是，大部分new出来的对象会进入堆空间中，而并非是全部的对象，其实还有另外两个地方可以存储new的对象，我们称之为栈上分配以及TLAB。</p>
+
+        <h2 id="栈上分配"   >
+          <a href="#栈上分配" class="heading-link"><i class="fas fa-link"></i></a><a href="#栈上分配" class="headerlink" title="栈上分配"></a>栈上分配</h2>
       
-        <h3 id="三、测试"   >
-          <a href="#三、测试" class="heading-link"><i class="fas fa-link"></i></a><a href="#三、测试" class="headerlink" title="三、测试"></a>三、测试</h3>
-      ]]></content>
+        <h4 id="栈上分配是什么？"   >
+          <a href="#栈上分配是什么？" class="heading-link"><i class="fas fa-link"></i></a><a href="#栈上分配是什么？" class="headerlink" title="栈上分配是什么？"></a>栈上分配是什么？</h4>
+      <p>JVM提供了一种叫做栈上分配的概念，针对那些作用域不会逃逸出方法的对象，在分配内存时不在将对象分配在堆内存中，而是将对象属性打散后分配在栈上（线程私有，属于栈内存），这样随着方法的调用结束，栈空间的回收就会随着栈上分配的打散后的对象回收掉，不再给GC增加额外的无用负担，从而提升应用程序整体的性能。</p>
+<span id="more"></span>
+
+
+        <h4 id="为什么需要栈上分配？"   >
+          <a href="#为什么需要栈上分配？" class="heading-link"><i class="fas fa-link"></i></a><a href="#为什么需要栈上分配？" class="headerlink" title="为什么需要栈上分配？"></a>为什么需要栈上分配？</h4>
+      <p>在应用程序中，其实有很多的对象的作用域都不会逃逸出方法外，也就是说该对象的生命周期会随着方法的调用而开始，方法的调用结束而结束，对于这种对象，就应该考虑将该对象不分配在堆空间中。因为一旦分配在堆空间中，当方法调用结束，没有了引用指向该对象，该对象就需要被GC回收，而如果存在大量的这种情况，对GC来说无疑时一种负担。</p>
+
+        <h4 id="如何开启栈上分配？"   >
+          <a href="#如何开启栈上分配？" class="heading-link"><i class="fas fa-link"></i></a><a href="#如何开启栈上分配？" class="headerlink" title="如何开启栈上分配？"></a>如何开启栈上分配？</h4>
+      <p>栈上分配需要的前提：</p>
+<p>（1）开启逃逸分析（-XX:+DoEscapeAnalysis）</p>
+<p>逃逸分析的作用就是分析对象的作用域是否会逃逸出方法之外，在Server虚拟机模式下才可以开启（jdk1.6默认开启）</p>
+<p>（2）开启标量替换（-XX:+EliminateAllocations）</p>
+<p>标量替换的作用是允许将对象根据属性打散后分配在栈上，默认该配置为开启</p>
+
+        <h4 id="如何查看逃逸分析的筛选结果？"   >
+          <a href="#如何查看逃逸分析的筛选结果？" class="heading-link"><i class="fas fa-link"></i></a><a href="#如何查看逃逸分析的筛选结果？" class="headerlink" title="如何查看逃逸分析的筛选结果？"></a>如何查看逃逸分析的筛选结果？</h4>
+      <p>配置 -XX:+PrintEscapeAnalysis 开启打印逃逸分析筛选结果</p>
+
+        <h2 id="TLAB"   >
+          <a href="#TLAB" class="heading-link"><i class="fas fa-link"></i></a><a href="#TLAB" class="headerlink" title="TLAB"></a>TLAB</h2>
+      
+        <h4 id="TLAB是什么？"   >
+          <a href="#TLAB是什么？" class="heading-link"><i class="fas fa-link"></i></a><a href="#TLAB是什么？" class="headerlink" title="TLAB是什么？"></a>TLAB是什么？</h4>
+      <p>全程叫做：Thread Local Allocation Buffer 即线程本地分配缓存</p>
+<p>就是给每个线程分配一小块私有的堆空间，即TLAB是一块线程私有的堆空间（实际上是Eden区中划出的）。</p>
+
+        <h4 id="为什么需要TLAB？"   >
+          <a href="#为什么需要TLAB？" class="heading-link"><i class="fas fa-link"></i></a><a href="#为什么需要TLAB？" class="headerlink" title="为什么需要TLAB？"></a>为什么需要TLAB？</h4>
+      <p>一般来说，对象分配在堆上，而堆是一个全局共享的区域，当多个线程同一时刻操作堆内存分配对象空间时，就需要进行同步，而同步带来的效果就是对象分配效率变差（尽管JVM采用了CAS的形式处理分配失败的情况），但是对于存在竞争激烈的分配场合仍然会导致效率变差。（简而言之：需要TLAB的原因就是提高对象在堆上的分配效率）</p>
+
+        <h4 id="如何开启TLAB？"   >
+          <a href="#如何开启TLAB？" class="heading-link"><i class="fas fa-link"></i></a><a href="#如何开启TLAB？" class="headerlink" title="如何开启TLAB？"></a>如何开启TLAB？</h4>
+      <p>JVM默认开启了TLAB功能，可以使用-XX:+UseTLAB 显示是否开启。</p>
+
+        <h4 id="如何观察TLAB使用情况？"   >
+          <a href="#如何观察TLAB使用情况？" class="heading-link"><i class="fas fa-link"></i></a><a href="#如何观察TLAB使用情况？" class="headerlink" title="如何观察TLAB使用情况？"></a>如何观察TLAB使用情况？</h4>
+      <p>JVM提供了-XX:+PrintTLAB，可以打开跟踪TLAB的使用情况。</p>
+
+        <h4 id="如何调整TLAB默认大小？"   >
+          <a href="#如何调整TLAB默认大小？" class="heading-link"><i class="fas fa-link"></i></a><a href="#如何调整TLAB默认大小？" class="headerlink" title="如何调整TLAB默认大小？"></a>如何调整TLAB默认大小？</h4>
+      <p>-XX:TLABSize 通过该参数指定分配给每一个线程的TLAB空间的大小。</p>
+
+        <h2 id="栈上分配和TLAB的对比"   >
+          <a href="#栈上分配和TLAB的对比" class="heading-link"><i class="fas fa-link"></i></a><a href="#栈上分配和TLAB的对比" class="headerlink" title="栈上分配和TLAB的对比"></a>栈上分配和TLAB的对比</h2>
+      <div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">名称</th>
+<th align="center">针对点</th>
+<th align="center">处于对象分配流程的位置</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">栈上分配</td>
+<td align="center">避免GC无畏负担</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">TLAB</td>
+<td align="center">加速堆上对象的分配</td>
+<td align="center">2</td>
+</tr>
+</tbody></table></div>
+
+        <h2 id="对象分配流程图"   >
+          <a href="#对象分配流程图" class="heading-link"><i class="fas fa-link"></i></a><a href="#对象分配流程图" class="headerlink" title="对象分配流程图"></a>对象分配流程图</h2>
+      <p><span class="exturl"><a class="exturl__link"   href="https://processon.com/diagraming/609de1d91e08533129c22d0f" >对象分配流程图 - ProcessOn</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
+<p><img src="/mdimages/image-20210514104238560.png" alt="image-20210514104238560"></p>
+]]></content>
       <categories>
-        <category>Linux命令</category>
+        <category>JVM</category>
       </categories>
       <tags>
-        <tag>linux</tag>
+        <tag>JVM</tag>
       </tags>
   </entry>
 </search>
