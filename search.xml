@@ -1017,8 +1017,8 @@
         <h3 id="12-锁优化之锁消除"   >
           <a href="#12-锁优化之锁消除" class="heading-link"><i class="fas fa-link"></i></a><a href="#12-锁优化之锁消除" class="headerlink" title="12.锁优化之锁消除"></a>12.锁优化之锁消除</h3>
       <p>锁消除：锁消除是Java虚拟机在JIT编译是，通过对运行上下文的扫描，去除不可能存在共享资源竞争的锁，通过锁消除，可以节省毫无意义的请求锁时间。</p>
-<p>当一段代码中加了锁，但是通过JVM分析，他是线程安全的，那么JVM会把锁去掉。</p>
-<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">append</span><span class="params">(String a,String b)</span></span>&#123;</span><br><span class="line">    StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">     sb.append(a);      <span class="comment">//append方法是synchronized修饰的，属于同步方法，每次执行都会加锁，但是经过JVM分析这                         //个append(String a,String b)方法是线程安全的，所以这个加锁可以去掉，叫锁消除。 </span></span><br><span class="line">     sb.append(b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+<p>当一段代码中加了锁，但是通过JVM分析，他是线程安全的，那么JVM会对这些同步锁进行锁消除，也就是取消加锁操作。</p>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">append</span><span class="params">(String a,String b)</span></span>&#123;</span><br><span class="line">    StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">     sb.append(a);                            </span><br><span class="line">     sb.append(b);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//StringBuffer是线程安全的，其方法都被synchronized修饰，是同步的，JVM会分析sb引用只会在append方法中使用，不可能被其他线程引用(局部变量，属栈私有)，因此sb是不可能共享资源的，JVM会自动消除StringBuffer对象内部的锁。</span></span><br></pre></td></tr></table></div></figure>
 
 
 
@@ -1026,8 +1026,14 @@
         <h3 id="12-锁优化之锁粗化"   >
           <a href="#12-锁优化之锁粗化" class="heading-link"><i class="fas fa-link"></i></a><a href="#12-锁优化之锁粗化" class="headerlink" title="12.锁优化之锁粗化"></a>12.锁优化之锁粗化</h3>
       <p>锁粗化：当JVM检测到一段连续的多次操作都在对同一个对象多次加锁，那么JVM可能会优化成对整段加一个锁，没有把加锁的操作分的那么细，所以叫锁粗化。</p>
-<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> StringBuffer <span class="title">append</span><span class="params">(String a,String b)</span></span>&#123;</span><br><span class="line">    StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; <span class="number">100</span>; i++)&#123;</span><br><span class="line">        sb.append(a);      <span class="comment">//append方法会被调用多次加锁，JVM检测后会对整个方法进行加锁，叫锁粗化</span></span><br><span class="line">        sb.append(b);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> sb;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> StringBuffer <span class="title">append</span><span class="params">(String a)</span></span>&#123;</span><br><span class="line">    StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; <span class="number">100</span>; i++)&#123;</span><br><span class="line">        sb.append(a);       </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> sb;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//JVM检测分析这一连串的操作都是对同一个对象加锁，循环体中如果没有锁粗化的话那么就要执行100次加锁解锁操作，此时JVM就会将加锁的范围粗化到这一连串的操作的外部(比如for循环体外)，使得这一连串操作只需要加一次锁即可。</span></span><br></pre></td></tr></table></div></figure>
 
 ]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+      </tags>
   </entry>
 </search>
