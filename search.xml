@@ -847,12 +847,12 @@
     <title>浅谈JDK1.6及以上版本对synchronized的优化</title>
     <url>/2021/06/21/JDK1.6%E5%BC%80%E5%A7%8Bsynchronized%E7%9A%84%E4%BC%98%E5%8C%96/</url>
     <content><![CDATA[
-        <h3 id="1-概叙"   >
-          <a href="#1-概叙" class="heading-link"><i class="fas fa-link"></i></a><a href="#1-概叙" class="headerlink" title="1.概叙"></a>1.概叙</h3>
+        <h3 id="概叙"   >
+          <a href="#概叙" class="heading-link"><i class="fas fa-link"></i></a><a href="#概叙" class="headerlink" title="概叙"></a>概叙</h3>
       <p>在JDK最开始的时候synchronized属于重量级的锁，每次加锁都是通过操作系统来申请锁，所以导致效率比较低，但在JDK1.6及以上版本中对它进行了优化，为减少获得锁和释放锁带来的性能消耗引入了偏向锁和轻量级锁，以及锁的存储结构和升级过程，不再是一开始就向操作系统申请锁，而是分成偏向锁 - 轻量级锁 - 重量级锁三个过程。</p>
 
-        <h3 id="2-实现同步的基础"   >
-          <a href="#2-实现同步的基础" class="heading-link"><i class="fas fa-link"></i></a><a href="#2-实现同步的基础" class="headerlink" title="2.实现同步的基础"></a>2.实现同步的基础</h3>
+        <h3 id="实现同步的基础"   >
+          <a href="#实现同步的基础" class="heading-link"><i class="fas fa-link"></i></a><a href="#实现同步的基础" class="headerlink" title="实现同步的基础"></a>实现同步的基础</h3>
       <p>Java中的每个对象都可以作为锁。</p>
 <ul>
 <li>普通同步方法，锁是当前实例对象。</li>
@@ -863,16 +863,16 @@
 <span id="more"></span>
 
 
-        <h3 id="3-synchronized的特点"   >
-          <a href="#3-synchronized的特点" class="heading-link"><i class="fas fa-link"></i></a><a href="#3-synchronized的特点" class="headerlink" title="3.synchronized的特点"></a>3.synchronized的特点</h3>
+        <h3 id="synchronized的特点"   >
+          <a href="#synchronized的特点" class="heading-link"><i class="fas fa-link"></i></a><a href="#synchronized的特点" class="headerlink" title="synchronized的特点"></a>synchronized的特点</h3>
       <ul>
 <li>原子性，不可分割，要么全部执行成功，要么全部失败</li>
 <li>可见性，一个线程对共享变量的修改，其他线程能够立马看见</li>
 <li>有序性，代码执行的逻辑是按照编写时的顺序执行的(禁止指令重排)</li>
 </ul>
 
-        <h3 id="4-实现方式"   >
-          <a href="#4-实现方式" class="heading-link"><i class="fas fa-link"></i></a><a href="#4-实现方式" class="headerlink" title="4.实现方式"></a>4.实现方式</h3>
+        <h3 id="实现方式"   >
+          <a href="#实现方式" class="heading-link"><i class="fas fa-link"></i></a><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h3>
       <p>synchronized的背后正是利用了Monitor锁对象来实现同步方法和同步代码块，但是两者的实现细节不一样。</p>
 <ul>
 <li>同步代码块：通过使用monitorenter和monitorexit指令实现。</li>
@@ -894,12 +894,12 @@
 <p>同步代码块：monitorenter指令是在编译后插入到同步代码块的开始位置，而monitorexit指令总共出现了2次，第一次是在编译后插入到同步代码块的结束处，第二次是同步代码块的异常处，保证无论正常或者异常退出都能释放锁。</p>
 <p>同步方法：被synchronized修饰的方法会有一个ACC_SYNCHRONIZED标志。当某个线程要访问某个同步方法时，会先检查方法是否有ACC_SYNCHRONIZED标志，如果有则需要先获得monitor锁才能开始执行方法，执行完后再是否monitor锁。</p>
 
-        <h3 id="5-在HotSpot虚拟机中，对象在内存中存储的布局可以分为三个区域：对象头，实例数据和对齐填充。"   >
-          <a href="#5-在HotSpot虚拟机中，对象在内存中存储的布局可以分为三个区域：对象头，实例数据和对齐填充。" class="heading-link"><i class="fas fa-link"></i></a><a href="#5-在HotSpot虚拟机中，对象在内存中存储的布局可以分为三个区域：对象头，实例数据和对齐填充。" class="headerlink" title="5.在HotSpot虚拟机中，对象在内存中存储的布局可以分为三个区域：对象头，实例数据和对齐填充。"></a>5.在HotSpot虚拟机中，对象在内存中存储的布局可以分为三个区域：对象头，实例数据和对齐填充。</h3>
+        <h3 id="在HotSpot虚拟机中，对象在内存中存储的布局可以分为三个区域：对象头，实例数据和对齐填充。"   >
+          <a href="#在HotSpot虚拟机中，对象在内存中存储的布局可以分为三个区域：对象头，实例数据和对齐填充。" class="heading-link"><i class="fas fa-link"></i></a><a href="#在HotSpot虚拟机中，对象在内存中存储的布局可以分为三个区域：对象头，实例数据和对齐填充。" class="headerlink" title="在HotSpot虚拟机中，对象在内存中存储的布局可以分为三个区域：对象头，实例数据和对齐填充。"></a>在HotSpot虚拟机中，对象在内存中存储的布局可以分为三个区域：对象头，实例数据和对齐填充。</h3>
       <p><img src="/mdimages/image-20210622002758920.png" alt="image-20210622002758920"></p>
 
-        <h4 id="5-1Java对象头"   >
-          <a href="#5-1Java对象头" class="heading-link"><i class="fas fa-link"></i></a><a href="#5-1Java对象头" class="headerlink" title="5.1Java对象头"></a>5.1Java对象头</h4>
+        <h4 id="Java对象头"   >
+          <a href="#Java对象头" class="heading-link"><i class="fas fa-link"></i></a><a href="#Java对象头" class="headerlink" title="Java对象头"></a>Java对象头</h4>
       <p>对象头中包含两个部分的信息：Mark Word（运行时数据）和类型指针（Class Pointer）.</p>
 <p>如果是数组对象的话，对象头就会多一部分信息是存储数组的长度（Length）.</p>
 <p>重点：多线程下synchronized的加锁就是对同一个对象的对象头中的Mark Word中的变量进行CAS操作(下面会详细说明)。</p>
@@ -916,17 +916,17 @@
         <h5 id="数组长度-Length-数组对象才有"   >
           <a href="#数组长度-Length-数组对象才有" class="heading-link"><i class="fas fa-link"></i></a><a href="#数组长度-Length-数组对象才有" class="headerlink" title="数组长度(Length,数组对象才有)"></a>数组长度(Length,数组对象才有)</h5>
       
-        <h4 id="5-2实例数据"   >
-          <a href="#5-2实例数据" class="heading-link"><i class="fas fa-link"></i></a><a href="#5-2实例数据" class="headerlink" title="5.2实例数据"></a>5.2实例数据</h4>
+        <h4 id="实例数据"   >
+          <a href="#实例数据" class="heading-link"><i class="fas fa-link"></i></a><a href="#实例数据" class="headerlink" title="实例数据"></a>实例数据</h4>
       <p>实例数据才是存储对象真正存储的有效信息（即程序代码中定义的各种类型的字段内容）。</p>
 <p>无论是父类继承下来的，还是在子类定义的，都记录下来。</p>
 
-        <h4 id="5-3对齐填充"   >
-          <a href="#5-3对齐填充" class="heading-link"><i class="fas fa-link"></i></a><a href="#5-3对齐填充" class="headerlink" title="5.3对齐填充"></a>5.3对齐填充</h4>
+        <h4 id="对齐填充"   >
+          <a href="#对齐填充" class="heading-link"><i class="fas fa-link"></i></a><a href="#对齐填充" class="headerlink" title="对齐填充"></a>对齐填充</h4>
       <p>这部分不是必然存在的，只是位数不够拿来填充，为了整齐，仅仅起到占位符的作用，因为HotSpot VM的自动内存管理系统要求对象起始地址必须是8字节的整数倍，也即是说，对象的大小必须是8字节的整数倍。</p>
 
-        <h3 id="6-优化后synchronized锁的分类"   >
-          <a href="#6-优化后synchronized锁的分类" class="heading-link"><i class="fas fa-link"></i></a><a href="#6-优化后synchronized锁的分类" class="headerlink" title="6.优化后synchronized锁的分类"></a>6.优化后synchronized锁的分类</h3>
+        <h3 id="优化后synchronized锁的分类"   >
+          <a href="#优化后synchronized锁的分类" class="heading-link"><i class="fas fa-link"></i></a><a href="#优化后synchronized锁的分类" class="headerlink" title="优化后synchronized锁的分类"></a>优化后synchronized锁的分类</h3>
       <ul>
 <li>无锁状态</li>
 <li>偏向锁状态</li>
@@ -941,8 +941,8 @@
 <p>轻量级锁状态：指向线程栈中Lock Record的指针，锁标志位是 “00”；</p>
 <p>重量级锁状态：指向互斥量(重量级锁)的指针，锁标志位是 “10”；</p>
 
-        <h3 id="7-偏向锁"   >
-          <a href="#7-偏向锁" class="heading-link"><i class="fas fa-link"></i></a><a href="#7-偏向锁" class="headerlink" title="7.偏向锁"></a>7.偏向锁</h3>
+        <h3 id="偏向锁"   >
+          <a href="#偏向锁" class="heading-link"><i class="fas fa-link"></i></a><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h3>
       <p>大多数情况下，锁不仅不存在多线程竞争，而且总是由同一线程多次获得，为了让线程获得锁的代价更低，从JDK1.6开始引入了锁优化。偏向锁是针对于一个线程而已的，就是锁偏向于第一个获取它的线程，如果在接下来的执行过程中，该锁没有被其它的线程获取，则持有偏向锁的线程将不需要再进行同步了。</p>
 
         <h4 id="偏向锁的加锁"   >
@@ -975,16 +975,16 @@
       <p>加锁过程, 有线程A和线程B来竞争对象c的锁(如: synchronized(c){} ), 这时线程A和线程B同时将对象c的MarkWord复制到自己的锁记录中, 两者竞争去获取锁, 假设线程A成功获取锁, 并将对象c的对象头中的线程ID(MarkWord中)修改为指向自己的锁记录的指针, 这时线程B仍旧通过CAS去获取对象c的锁, 因为对象c的MarkWord中的内容已经被线程A改了, 所以获取失败. 此时为了提高获取锁的效率, 线程B会循环去获取锁, 这个循环是有次数限制的, 如果在循环结束之前CAS操作成功, 那么线程B就获取到锁, 如果循环结束依然获取不到锁, 则获取锁失败, 对象c的MarkWord中的记录会被修改为重量级锁, 然后线程B就会被挂起, 之后有线程C来获取锁时, 看到对象c的MarkWord中的是重量级锁的指针, 说明竞争激烈, 直接挂起.</p>
 <p>解锁过程, 线程A尝试使用CAS将对象c的MarkWord改回自己栈中复制的那个MarkWord, 因为对象c中的MarkWord已经被指向为重量级锁了, 所以CAS失败. 线程A会释放锁并唤起等待的线程, 进行新一轮的竞争.</p>
 
-        <h3 id="9-重量级锁"   >
-          <a href="#9-重量级锁" class="heading-link"><i class="fas fa-link"></i></a><a href="#9-重量级锁" class="headerlink" title="9.重量级锁"></a>9.重量级锁</h3>
+        <h3 id="重量级锁"   >
+          <a href="#重量级锁" class="heading-link"><i class="fas fa-link"></i></a><a href="#重量级锁" class="headerlink" title="重量级锁"></a>重量级锁</h3>
       <p> 重量级锁就是最开始的线程阻塞操作，又叫悲观锁，对象头中MarkWord的锁标志位为10，它锁住的是一整段代码，当整段代码执行完后，其他线程才能获得锁，继续执行。</p>
 
-        <h3 id="10-锁升级流程图"   >
-          <a href="#10-锁升级流程图" class="heading-link"><i class="fas fa-link"></i></a><a href="#10-锁升级流程图" class="headerlink" title="10.锁升级流程图"></a>10.锁升级流程图</h3>
+        <h3 id="锁升级流程图"   >
+          <a href="#锁升级流程图" class="heading-link"><i class="fas fa-link"></i></a><a href="#锁升级流程图" class="headerlink" title="锁升级流程图"></a>锁升级流程图</h3>
       <p><img src="/mdimages/image-20210622233415801.png" alt="image-20210622233415801"></p>
 
-        <h3 id="11-三者的优缺点"   >
-          <a href="#11-三者的优缺点" class="heading-link"><i class="fas fa-link"></i></a><a href="#11-三者的优缺点" class="headerlink" title="11.三者的优缺点"></a>11.三者的优缺点</h3>
+        <h3 id="三者的优缺点"   >
+          <a href="#三者的优缺点" class="heading-link"><i class="fas fa-link"></i></a><a href="#三者的优缺点" class="headerlink" title="三者的优缺点"></a>三者的优缺点</h3>
       <div class="table-container"><table>
 <thead>
 <tr>
@@ -1014,8 +1014,8 @@
 </tr>
 </tbody></table></div>
 
-        <h3 id="12-锁优化之锁消除"   >
-          <a href="#12-锁优化之锁消除" class="heading-link"><i class="fas fa-link"></i></a><a href="#12-锁优化之锁消除" class="headerlink" title="12.锁优化之锁消除"></a>12.锁优化之锁消除</h3>
+        <h3 id="锁优化之锁消除"   >
+          <a href="#锁优化之锁消除" class="heading-link"><i class="fas fa-link"></i></a><a href="#锁优化之锁消除" class="headerlink" title="锁优化之锁消除"></a>锁优化之锁消除</h3>
       <p>锁消除：锁消除是Java虚拟机在JIT编译是，通过对运行上下文的扫描，去除不可能存在共享资源竞争的锁，通过锁消除，可以节省毫无意义的请求锁时间。</p>
 <p>当一段代码中加了锁，但是通过JVM分析，他是线程安全的，那么JVM会对这些同步锁进行锁消除，也就是取消加锁操作。</p>
 <figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">append</span><span class="params">(String a,String b)</span></span>&#123;</span><br><span class="line">    StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">     sb.append(a);                            </span><br><span class="line">     sb.append(b);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//StringBuffer是线程安全的，其方法都被synchronized修饰，是同步的，JVM会分析sb引用只会在append方法中使用，不可能被其他线程引用(局部变量，属栈私有)，因此sb是不可能共享资源的，JVM会自动消除StringBuffer对象内部的锁。</span></span><br></pre></td></tr></table></div></figure>
@@ -1023,8 +1023,8 @@
 
 
 
-        <h3 id="12-锁优化之锁粗化"   >
-          <a href="#12-锁优化之锁粗化" class="heading-link"><i class="fas fa-link"></i></a><a href="#12-锁优化之锁粗化" class="headerlink" title="12.锁优化之锁粗化"></a>12.锁优化之锁粗化</h3>
+        <h3 id="锁优化之锁粗化"   >
+          <a href="#锁优化之锁粗化" class="heading-link"><i class="fas fa-link"></i></a><a href="#锁优化之锁粗化" class="headerlink" title="锁优化之锁粗化"></a>锁优化之锁粗化</h3>
       <p>锁粗化：当JVM检测到一段连续的多次操作都在对同一个对象多次加锁，那么JVM可能会优化成对整段加一个锁，没有把加锁的操作分的那么细，所以叫锁粗化。</p>
 <figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> StringBuffer <span class="title">append</span><span class="params">(String a)</span></span>&#123;</span><br><span class="line">    StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; <span class="number">100</span>; i++)&#123;</span><br><span class="line">        sb.append(a);       </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> sb;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//JVM检测分析这一连串的操作都是对同一个对象加锁，循环体中如果没有锁粗化的话那么就要执行100次加锁解锁操作，此时JVM就会将加锁的范围粗化到这一连串的操作的外部(比如for循环体外)，使得这一连串操作只需要加一次锁即可。</span></span><br></pre></td></tr></table></div></figure>
 
