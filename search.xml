@@ -1016,7 +1016,7 @@
 
         <h3 id="锁优化之锁消除"   >
           <a href="#锁优化之锁消除" class="heading-link"><i class="fas fa-link"></i></a><a href="#锁优化之锁消除" class="headerlink" title="锁优化之锁消除"></a>锁优化之锁消除</h3>
-      <p>锁消除：锁消除是Java虚拟机在JIT编译是，通过对运行上下文的扫描，去除不可能存在共享资源竞争的锁，通过锁消除，可以节省毫无意义的请求锁时间。</p>
+      <p>锁消除：锁消除是Java虚拟机在JIT编译时，通过对运行上下文的扫描，去除不可能存在共享资源竞争的锁，通过锁消除，可以节省毫无意义的请求锁时间。</p>
 <p>当一段代码中加了锁，但是通过JVM分析，他是线程安全的，那么JVM会对这些同步锁进行锁消除，也就是取消加锁操作。</p>
 <figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">append</span><span class="params">(String a,String b)</span></span>&#123;</span><br><span class="line">    StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">     sb.append(a);                            </span><br><span class="line">     sb.append(b);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//StringBuffer是线程安全的，其方法都被synchronized修饰，是同步的，JVM会分析sb引用只会在append方法中使用，不可能被其他线程引用(局部变量，属栈私有)，因此sb是不可能共享资源的，JVM会自动消除StringBuffer对象内部的锁。</span></span><br></pre></td></tr></table></div></figure>
 
@@ -1034,6 +1034,146 @@
       </categories>
       <tags>
         <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JVM之逃逸分析</title>
+    <url>/2021/06/23/JVM%E4%B9%8B%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/</url>
+    <content><![CDATA[
+        <h3 id="逃逸"   >
+          <a href="#逃逸" class="heading-link"><i class="fas fa-link"></i></a><a href="#逃逸" class="headerlink" title="逃逸"></a>逃逸</h3>
+      <p>当一个对象的指针被多个方法或者线程引用时，我们称这个指针发生了逃逸，一般情况返回对象、对全局变量的赋值一般都会发生逃逸现象。</p>
+<p>逃逸分为两种：</p>
+<ul>
+<li>方法逃逸：当一个对象在方法中被定义后，可能作为调用参数被外部方法所引用。</li>
+<li>线程逃逸：通过赋值给类变量或者作为实例变量在其他线程中可以被访问到。</li>
+</ul>
+
+        <h3 id="逃逸分析"   >
+          <a href="#逃逸分析" class="heading-link"><i class="fas fa-link"></i></a><a href="#逃逸分析" class="headerlink" title="逃逸分析"></a>逃逸分析</h3>
+      <p>Java中对象的创建一般会由堆内存去分配内存空间来进行存储，在堆内存空间不足的时候，GC便会对堆内存进行垃圾回收，如果GC运行的次数过多，便会影响程序的性能，所以“逃逸分析”从<font color="red">JDK1.6开始引入</font>，在<font color="red">JDK1.7开始默认开启逃逸分析</font>，它的目的就是判断哪些对象是可以存储在栈内存中而不用存储在堆内存中的，从而让其随着线程的销毁而销毁，进而减少了GC发生的频率。</p>
+<p>简单来讲就是，Java Hotspot 虚拟机可以分析新创建对象的使用范围，并决定是否在Java堆上分配内存的一项技术。</p>
+<p>在方法中创建对象之后，如果这个对象除了在方法体中还在其他地方被引用了，此时如果方法执行完，由于该对象有被引用，所以GC有可能是无法立即回收的，此时便成为内存逃逸现象。</p>
+
+        <h3 id="逃逸分析参数设置"   >
+          <a href="#逃逸分析参数设置" class="heading-link"><i class="fas fa-link"></i></a><a href="#逃逸分析参数设置" class="headerlink" title="逃逸分析参数设置"></a>逃逸分析参数设置</h3>
+      <ul>
+<li>开启逃逸分析：-XX:+DoEscapeAnalysis</li>
+<li>关闭逃逸分析：-XX:-DoEscapeAnalysis</li>
+</ul>
+<p>JDK1.7开始默认开启逃逸分析</p>
+<p>代码演示（以主流JDK1.8为准）：</p>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="comment">//让线程好好睡眠</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">       Thread.sleep(<span class="number">100000000</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">=======================================================================================</span><br><span class="line"><span class="comment">//使用java -version 查看当前JDK版本</span></span><br><span class="line">D:\workproject\designDemo&gt;java -version</span><br><span class="line">java version <span class="string">&quot;1.8.0_144&quot;</span></span><br><span class="line">Java(TM) <span class="function">SE Runtime <span class="title">Environment</span> <span class="params">(build <span class="number">1.8</span><span class="number">.0_144</span>-b01)</span></span></span><br><span class="line"><span class="function">Java <span class="title">HotSpot</span><span class="params">(TM)</span> 64-Bit Server <span class="title">VM</span> <span class="params">(build <span class="number">25.144</span>-b01, mixed mode)</span></span></span><br><span class="line"><span class="function"><span class="comment">//使用jps -l 命令查看java进程号</span></span></span><br><span class="line"><span class="function">D:\workproject\designDemo&gt;jps -l</span></span><br><span class="line"><span class="function">20116</span></span><br><span class="line"><span class="function">18040 sun.tools.jps.Jps</span></span><br><span class="line"><span class="function">11124 com.test.demot.Test</span></span><br><span class="line"><span class="function">2396 org.jetbrains.jps.cmdline.Launcher</span></span><br><span class="line"><span class="function"><span class="comment">//使用jinfo -flag DoEscapeAnalysis 查看是否开启了逃逸分析</span></span></span><br><span class="line"><span class="function">D:\workproject\designDemo&gt;jinfo -flag DoEscapeAnalysis 11124</span></span><br><span class="line"><span class="function">-XX:+DoEscapeAnalysis</span></span><br><span class="line"><span class="function"><span class="comment">//从结果中可以看出 -XX:+DoEscapeAnalysis 是默认开启的</span></span></span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="逃逸分析的作用"   >
+          <a href="#逃逸分析的作用" class="heading-link"><i class="fas fa-link"></i></a><a href="#逃逸分析的作用" class="headerlink" title="逃逸分析的作用"></a>逃逸分析的作用</h3>
+      <p>逃逸分析的作用：就是筛选出没有发生逃逸的对象，从而对它们进行三个方面的优化：（1）<font color="red">锁消除</font>、（2）<font color="red">标量替换</font>、（3）<font color="red">栈内存分配</font></p>
+
+        <h4 id="锁消除（同步消除）"   >
+          <a href="#锁消除（同步消除）" class="heading-link"><i class="fas fa-link"></i></a><a href="#锁消除（同步消除）" class="headerlink" title="锁消除（同步消除）"></a>锁消除（同步消除）</h4>
+      <p>因为同步锁是非常消耗性能的，所以当编译器确定一个对象没有发生逃逸时，它便会移除该对象的同步锁。</p>
+<p>在<font color="red">JDK1.8</font>是默认开启的，但是要建立在已开启逃逸分析的基础上。</p>
+<p>开启锁消除：-XX:+EliminateLocks</p>
+<p>关闭锁消除：-XX:-EliminateLocks</p>
+
+        <h4 id="标量替换"   >
+          <a href="#标量替换" class="heading-link"><i class="fas fa-link"></i></a><a href="#标量替换" class="headerlink" title="标量替换"></a>标量替换</h4>
+      <p>标量：基础类型和对象的引用可以理解为标量，它们不能被进一步分解。</p>
+<p>聚合量：能被进一步分解的就是聚合量，比如：对象。</p>
+<p>对象是聚合量，它可以被进一步分解成标量，将其成员变量分解为分散的变量，这就叫做标量替换。</p>
+<p>所以，如果一个对象没有发生逃逸，那压根就不用创建它了，只会在栈或者寄存器上创建它用到的成员变量，节省内存空间，也提升应用程序性能。</p>
+<p>标量替换在<font color="red">JDK1.8</font>中也是默认开启的，但是同样也要建立在已开启逃逸分析的基础上。</p>
+<p>开启标量替换：-XX:+EliminateAllocations</p>
+<p>关闭标量替换：-XX:-EliminateAllocations</p>
+
+        <h4 id="栈内存分配（专业术语：栈上分配）"   >
+          <a href="#栈内存分配（专业术语：栈上分配）" class="heading-link"><i class="fas fa-link"></i></a><a href="#栈内存分配（专业术语：栈上分配）" class="headerlink" title="栈内存分配（专业术语：栈上分配）"></a>栈内存分配（专业术语：栈上分配）</h4>
+      <p>栈内存分配，就是将原本分配在堆内存中的对象转而分配在栈内存上，这样就可以减少堆内存的占用，从而减少GC的频次。</p>
+
+        <h3 id="逃逸分析测试"   >
+          <a href="#逃逸分析测试" class="heading-link"><i class="fas fa-link"></i></a><a href="#逃逸分析测试" class="headerlink" title="逃逸分析测试"></a>逃逸分析测试</h3>
+      
+        <h4 id="逃逸分析开启与关闭测试"   >
+          <a href="#逃逸分析开启与关闭测试" class="heading-link"><i class="fas fa-link"></i></a><a href="#逃逸分析开启与关闭测试" class="headerlink" title="逃逸分析开启与关闭测试"></a>逃逸分析开启与关闭测试</h4>
+      <p>代码演示：</p>
+<p>循环200W次调用createPerson()方法，createPerson()方法的作用仅仅是简单创建一个对象，但是这个对象是属于方法内部的(局部变量)并且没有作为其他方法的调用参数，所以是未逃逸的，理论上JVM是会对其进行优化。下面是开启逃逸分析和关闭逃逸分析之后的比较：</p>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> start = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2000000</span>; i++) &#123;</span><br><span class="line">            createPerson();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">long</span> end = System.currentTimeMillis();</span><br><span class="line">        System.out.println(end - start);</span><br><span class="line">        <span class="comment">//让线程好好睡眠1小时，方便对它进行分析</span></span><br><span class="line">        TimeUnit.HOURS.sleep(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">createPerson</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Person person = <span class="keyword">new</span> Person();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Integer id;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="comment">//getter seeter方法......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+
+<p>1、使用JDK1.8环境，JDK1.8是默认开启逃逸分析</p>
+<p><img src="/mdimages/image-20210624225703954.png" alt="image-20210624225703954"></p>
+<p>从运行结果来看，耗时5毫秒；</p>
+<p><img src="/mdimages/image-20210624225805365.png" alt="image-20210624225805365"></p>
+<p>使用jmap命令打印堆内存中对象的统计信息，可以看到循环200万次，创建10W个左右的对象；</p>
+<p>2、使用JDK1.8环境，JDK1.8是默认开启逃逸分析，所以需要使用命令-XX:-DoEscapeAnalysis来关闭逃逸分析；</p>
+<p><img src="/mdimages/image-20210624225617447.png" alt="image-20210624225617447"></p>
+<p>从运行结果来看，耗时25毫秒；</p>
+<p><img src="/mdimages/image-20210624225530869.png" alt="image-20210624225530869"></p>
+<p>使用jmap命令打印堆内存中对象的统计信息，可以看到循环200万次，创建200W个的对象；</p>
+<p>小结：无论是从代码的执行时间或者是从堆内存中对象的统计信息来分析，在上述场景下，开启逃逸分析是有性能优化的。</p>
+
+        <h4 id="标量替换开启与关闭测试"   >
+          <a href="#标量替换开启与关闭测试" class="heading-link"><i class="fas fa-link"></i></a><a href="#标量替换开启与关闭测试" class="headerlink" title="标量替换开启与关闭测试"></a>标量替换开启与关闭测试</h4>
+      <p>代码运行同上，主要通过参数-XX:+EliminateAllocations的开启和关闭来观察效果</p>
+<p>1、使用JDK1.8环境，JDK1.8是默认开启标量替换</p>
+<p><img src="/mdimages/image-20210624231020275.png" alt="image-20210624231020275"></p>
+<p><img src="/mdimages/image-20210624231226837.png" alt="image-20210624231226837"></p>
+<p>从运行结果来看，耗时5毫秒，并且堆内存创建的person对象是9万多个；</p>
+<p>2、使用JDK1.8环境，JDK1.8是默认开启标量替换，所以需要使用命令-XX:-EliminateAllocations来关闭标量替换；</p>
+<p><img src="/mdimages/image-20210624230735372.png" alt="image-20210624230735372"></p>
+<p><img src="/mdimages/image-20210624230910677.png" alt="image-20210624230910677"></p>
+<p>从运行结果来看，耗时27毫秒，并且堆内存创建的person对象是200万个；</p>
+<p>小结：从上述场景我们也可以看出，在开启逃逸分析的基础上，对于标量替换的开启和关闭对于性能的影响也是满大的。</p>
+
+        <h4 id="锁消除开启与关闭测试"   >
+          <a href="#锁消除开启与关闭测试" class="heading-link"><i class="fas fa-link"></i></a><a href="#锁消除开启与关闭测试" class="headerlink" title="锁消除开启与关闭测试"></a>锁消除开启与关闭测试</h4>
+      <p>演示代码：</p>
+<p><img src="/mdimages/image-20210624233323546.png" alt="image-20210624233323546"></p>
+<p>主要通过参数-XX:+EliminateLocks的开启和关闭来观察效果</p>
+<p>1、使用JDK1.8环境，JDK1.8是默认开启锁消除</p>
+<p><img src="/mdimages/image-20210624233714299.png" alt="image-20210624233714299"></p>
+<p><img src="/mdimages/image-20210624234158263.png" alt="image-20210624234158263"></p>
+<p>从运行结果和命令参数分析来看，耗时6毫秒，并且默认开启逃逸分析和锁消除；</p>
+<p>2、使用JDK1.8环境，JDK1.8是默认开启锁消除，所以需要使用命令-XX:-EliminateLocks来关闭标量替换；</p>
+<p><img src="/mdimages/image-20210624234441226.png" alt="image-20210624234441226"></p>
+<p><img src="/mdimages/image-20210624234652635.png" alt="image-20210624234652635"></p>
+<p>从运行结果和命令参数分析来看，关闭锁消除耗时57毫秒；</p>
+<p>小结：同样从以上场景，在开启逃逸分析的前提下，对锁消除的开启和关闭对程序性能的影响也是很大的。</p>
+
+        <h3 id="总结"   >
+          <a href="#总结" class="heading-link"><i class="fas fa-link"></i></a><a href="#总结" class="headerlink" title="总结"></a>总结</h3>
+      <p>总体上逃逸分析可以带来一定程度上的性能优化，但是同时逃逸分析自身也是需要消耗一定的性能去进行一系列复杂的分析的，这其实也是一个相对耗时的过程，所以说如果在方法中的对象全都处于逃逸状态，那么就没有起到优化的作用，从而白白消耗了这部分的性能。</p>
+
+        <h3 id="思考"   >
+          <a href="#思考" class="heading-link"><i class="fas fa-link"></i></a><a href="#思考" class="headerlink" title="思考"></a>思考</h3>
+      <p>是否所有的对象和数组都会在堆内存分配空间？</p>
+<p>不一定，JVM经过逃逸分析后，可能会将原本分配在堆内存中的对象转而分配在栈内存上。</p>
+<p>加了锁的代码，锁就一定会生效吗？</p>
+<p>不一定，JVM经过逃逸分析后，会去除不可能存在共享资源竞争的锁。</p>
+
+        <h3 id="知识补充"   >
+          <a href="#知识补充" class="heading-link"><i class="fas fa-link"></i></a><a href="#知识补充" class="headerlink" title="知识补充"></a>知识补充</h3>
+      <p>JAVA中所有的变量分为：（1）成员变量 和（2）局部变量</p>
+<p>（1）成员变量包括：</p>
+<ul>
+<li>实例变量</li>
+<li>类变量(static修饰)</li>
+</ul>
+<p>区别：实例变量是通过定义类的对象来访问的；类变量一般是通过类访问的，也可以用类对象来访问。</p>
+<p>生命周期：实例变量与类对象生存周期共存亡；类变量与类共存亡。</p>
+<p>（2）局部变量</p>
+<ul>
+<li>形参（方法参数）</li>
+<li>方法局部变量（在方法内定义的变量）</li>
+<li>代码块局部变量（在代码块内定义的变量）</li>
+</ul>
+<p>注：JAVA允许局部变量和成员变量同名，如果在方法内的局部变量和成员变量名相同，局部变量会覆盖成员变量，若要在这个方法里使用成员变量，可以使用this来调用成员变量。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
       </tags>
   </entry>
 </search>
