@@ -1,0 +1,929 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.6.2" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.6.2" type="image/png" sizes="32x32"><meta name="description" content="redis是什么       redis是一个非关系型数据库，是一种高级的key-value的存储系统，它支持多种类型的数据结构，键key是字符串类型，值value可以有多种类型，如字符串(string),散列(hash),列表(list),集合(set),有序集合(sorted set)  与 范围查询，biymaps,hyperloglogs和地理空间（geospatia">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis基础篇">
+<meta property="og:url" content="http://example.com/2021/07/02/Redis%E5%9F%BA%E7%A1%80%E7%AF%87/index.html">
+<meta property="og:site_name" content="Clown&#39;s bolg">
+<meta property="og:description" content="redis是什么       redis是一个非关系型数据库，是一种高级的key-value的存储系统，它支持多种类型的数据结构，键key是字符串类型，值value可以有多种类型，如字符串(string),散列(hash),列表(list),集合(set),有序集合(sorted set)  与 范围查询，biymaps,hyperloglogs和地理空间（geospatia">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/mdimages/image-20210702235433823.png">
+<meta property="og:image" content="http://example.com/mdimages/image-20210703113901463.png">
+<meta property="og:image" content="http://example.com/mdimages/image-20210703112810674.png">
+<meta property="og:image" content="http://example.com/mdimages/image-20210703120603606.png">
+<meta property="og:image" content="http://example.com/mdimages/image-20210703115925268.png">
+<meta property="og:image" content="http://example.com/mdimages/image-20210703152627731.png">
+<meta property="og:image" content="http://example.com/mdimages/image-20210703160847244.png">
+<meta property="og:image" content="http://example.com/mdimages/image-20210703161336918.png">
+<meta property="og:image" content="http://example.com/mdimages/image-20210703211859687.png">
+<meta property="og:image" content="http://example.com/mdimages/image-20210703214815203.png">
+<meta property="og:image" content="http://example.com/mdimages/image-20210703215554099.png">
+<meta property="article:published_time" content="2021-07-02T15:11:24.000Z">
+<meta property="article:modified_time" content="2021-07-03T13:57:40.766Z">
+<meta property="article:author" content="Clown">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/mdimages/image-20210702235433823.png"><title>Redis基础篇 | Clown's bolg</title><link ref="canonical" href="http://example.com/2021/07/02/Redis%E5%9F%BA%E7%A1%80%E7%AF%87/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.6.2"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":false},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: true,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: {"avoidBanner":false},
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.4.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Clown's bolg</div><div class="header-banner-info__subtitle"></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">Redis基础篇</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2021-07-02</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-07-03</span></span><span class="post-meta-item post-meta-item--visitors"><span class="post-meta-item__icon"><i class="fas fa-eye"></i></span><span class="post-meta-item__info">阅读次数</span><span class="post-meta-item__value" id="busuanzi_value_page_pv"></span></span></div></header><div class="post-body">
+        <h3 id="redis是什么"   >
+          <a href="#redis是什么" class="heading-link"><i class="fas fa-link"></i></a><a href="#redis是什么" class="headerlink" title="redis是什么"></a>redis是什么</h3>
+      <p>redis是一个非关系型数据库，是一种高级的key-value的存储系统，它支持多种类型的数据结构，键key是字符串类型，值value可以有多种类型，如<font color="red">字符串(string),散列(hash),列表(list),集合(set),有序集合(sorted set)</font>  与 范围查询，biymaps,hyperloglogs和地理空间（geospatial）索引半径查询。</p>
+<p>英文官网：<span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://redis.io/" >https://redis.io</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
+<p>中文网址：<span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="http://www.redis.cn/" >http://www.redis.cn</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
+<span id="more"></span>
+
+
+        <h3 id="为什么要使用redis"   >
+          <a href="#为什么要使用redis" class="heading-link"><i class="fas fa-link"></i></a><a href="#为什么要使用redis" class="headerlink" title="为什么要使用redis"></a>为什么要使用redis</h3>
+      
+        <h4 id="数据库高并发访问"   >
+          <a href="#数据库高并发访问" class="heading-link"><i class="fas fa-link"></i></a><a href="#数据库高并发访问" class="headerlink" title="数据库高并发访问"></a>数据库高并发访问</h4>
+      <p>在同一时间点，同时有海量的用户并发访问，往往要达到每秒上万次读写请求，关系型数据库应付上万次SQL查询勉强顶得住，但是应付上万次SQL写数据请求，硬盘IO就已经无法承受了。</p>
+
+        <h4 id="海量数据存储"   >
+          <a href="#海量数据存储" class="heading-link"><i class="fas fa-link"></i></a><a href="#海量数据存储" class="headerlink" title="海量数据存储"></a>海量数据存储</h4>
+      <p>数据库中数量特别大，数据库表中每天产生海量的数据，在一张数据量非常大的表里面进行SQL查询，效率是及其低下的。</p>
+
+        <h4 id="可扩展性和高可用性"   >
+          <a href="#可扩展性和高可用性" class="heading-link"><i class="fas fa-link"></i></a><a href="#可扩展性和高可用性" class="headerlink" title="可扩展性和高可用性"></a>可扩展性和高可用性</h4>
+      <p>对数据库系统进行升级和扩展是非常麻烦的事情，往往需要停机维护和数据迁移，而非关系型数据可以通过不断的添加服务器节点来实现扩展，而不需要对原有的数据库进行维护。</p>
+
+        <h3 id="如何使用redis"   >
+          <a href="#如何使用redis" class="heading-link"><i class="fas fa-link"></i></a><a href="#如何使用redis" class="headerlink" title="如何使用redis"></a>如何使用redis</h3>
+      <p>redis命令参照官网<span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="http://www.redis.cn/commands.html" >http://www.redis.cn/commands.html</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
+<p>这里主要介绍常用的五种数据类型。</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">值value的数据类型</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">string</td>
+<td align="center">字符串类型，常用的类型</td>
+</tr>
+<tr>
+<td align="center">hash</td>
+<td align="center">键和值组成，类型java中的Map</td>
+</tr>
+<tr>
+<td align="center">list</td>
+<td align="center">列表，元素有多个，可以重复，有序。类似于java中的List集合</td>
+</tr>
+<tr>
+<td align="center">set</td>
+<td align="center">集合,元素不可重复，无序。类似于java中的Set</td>
+</tr>
+<tr>
+<td align="center">zset</td>
+<td align="center">集合，元素无序的，可以排序。每个元素有一个分数，决定顺序。</td>
+</tr>
+</tbody></table></div>
+
+        <h4 id="string字符串类型"   >
+          <a href="#string字符串类型" class="heading-link"><i class="fas fa-link"></i></a><a href="#string字符串类型" class="headerlink" title="string字符串类型"></a>string字符串类型</h4>
+      <p>字符串类型是Redis中最为基础的数据存储类型，它在Redis中以二进制保存，没有字符的编码和解码过程，无论存入的是字符串、整数、浮点数类型都会以字符串写入。</p>
+<p>在Redis中字符串类型的值最多可以容纳的数据长度是512M.</p>
+
+        <h5 id="常用命令"   >
+          <a href="#常用命令" class="heading-link"><i class="fas fa-link"></i></a><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h5>
+      <div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">set key value</td>
+<td align="center">向redis数据库中添加一个键和值</td>
+</tr>
+<tr>
+<td align="center">get key</td>
+<td align="center">通过键获取值，如果没有这个键，返回nil</td>
+</tr>
+<tr>
+<td align="center">del key</td>
+<td align="center">通过键来删除键和值，返回删除的个数</td>
+</tr>
+</tbody></table></div>
+
+        <h5 id="命令演示"   >
+          <a href="#命令演示" class="heading-link"><i class="fas fa-link"></i></a><a href="#命令演示" class="headerlink" title="命令演示"></a>命令演示</h5>
+      <p>1.添加一个键为person,值为laowang</p>
+<p>2.再设置一个键为person,值为xiaowang</p>
+<p>3.获取键为person的值</p>
+<p>4.删除person元素</p>
+<p>5.再次删除person看返回值是什么</p>
+<p>6.再获取键为person的值</p>
+
+        <h5 id="执行结果"   >
+          <a href="#执行结果" class="heading-link"><i class="fas fa-link"></i></a><a href="#执行结果" class="headerlink" title="执行结果"></a>执行结果</h5>
+      <p><img src="/mdimages/image-20210702235433823.png" alt="image-20210702235433823"></p>
+
+        <h4 id="hash类型"   >
+          <a href="#hash类型" class="heading-link"><i class="fas fa-link"></i></a><a href="#hash类型" class="headerlink" title="hash类型"></a>hash类型</h4>
+      <p>Redis中的hash类型可以看作是键和值都是String类型的Map,每一个Hash可以存储4G个键值对。如Map&lt;String,Map&lt;String,String&gt;&gt;。</p>
+<p>该类型非常适合存储对象的信息，如一个人有姓名，年龄，性别等信息，则它的存储结构可以如下</p>
+<p>键person 字段有username、age、sex等，值是小王，18，男。</p>
+<p><img src="/mdimages/image-20210703113901463.png" alt="image-20210703113901463"></p>
+
+        <h5 id="常用命令-1"   >
+          <a href="#常用命令-1" class="heading-link"><i class="fas fa-link"></i></a><a href="#常用命令-1" class="headerlink" title="常用命令"></a>常用命令</h5>
+      <div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">hset  键  字段 值</td>
+<td align="center">添加一个hash类型的键，字段，值</td>
+</tr>
+<tr>
+<td align="center">hget 键 字段</td>
+<td align="center">通过键和字段得到一个值</td>
+</tr>
+<tr>
+<td align="center">hmset 键 字段 值 字段 值……</td>
+<td align="center">在一个键中一次设置多个字段和值</td>
+</tr>
+<tr>
+<td align="center">hmget 键 字段 字段……</td>
+<td align="center">通过一个键一次获取多个字段的值</td>
+</tr>
+<tr>
+<td align="center">hdel 键 字段 字段……</td>
+<td align="center">通过键和字段删除一个或多个字段和值</td>
+</tr>
+<tr>
+<td align="center">hgetall 键</td>
+<td align="center">得到一个键中所有的字段和值</td>
+</tr>
+</tbody></table></div>
+
+        <h5 id="命令演示-1"   >
+          <a href="#命令演示-1" class="heading-link"><i class="fas fa-link"></i></a><a href="#命令演示-1" class="headerlink" title="命令演示"></a>命令演示</h5>
+      <p>1.创建hash类型的键为user，并且添加一个字段为username，值为laowang</p>
+<p>2,向user中添加字段password,值为123456，字段为age，值为18</p>
+<p>3.分别得到user中的username、password、age字段的值</p>
+<p>4.同时获取username、password、age字段的值</p>
+<p>5.得到user中所有的字段和值</p>
+<p>6.删除user中的password、age字段和值</p>
+
+        <h5 id="执行结果-1"   >
+          <a href="#执行结果-1" class="heading-link"><i class="fas fa-link"></i></a><a href="#执行结果-1" class="headerlink" title="执行结果"></a>执行结果</h5>
+      <p><img src="/mdimages/image-20210703112810674.png" alt="image-20210703112810674"></p>
+
+        <h4 id="list类型"   >
+          <a href="#list类型" class="heading-link"><i class="fas fa-link"></i></a><a href="#list类型" class="headerlink" title="list类型"></a>list类型</h4>
+      <p>在Redis中，List类型是按照插入顺序排序的字符串链表。可以在其左边（left）或者右边（right）添加新的元素，<font color="red">在插入时，如果该键并不存在，Redis会为该键创建一个新的链表。</font>与此相反，如果链表中所有的元素均被移除，那么该键也将会被删除。</p>
+<p>List中可以包含的最大元素数量时4G个(41亿个)。</p>
+
+        <h5 id="常用命令-2"   >
+          <a href="#常用命令-2" class="heading-link"><i class="fas fa-link"></i></a><a href="#常用命令-2" class="headerlink" title="常用命令"></a>常用命令</h5>
+      <div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">lpush 键 元素 元素</td>
+<td align="center">从左边添加1个或多个元素，返回列表的长度</td>
+</tr>
+<tr>
+<td align="center">rpush 键 元素 元素</td>
+<td align="center">从右边添加1个或多个元素，返回列表的长度</td>
+</tr>
+<tr>
+<td align="center">lpop 键</td>
+<td align="center">从左边删除1个元素，返回被删除的元素</td>
+</tr>
+<tr>
+<td align="center">rpop 键</td>
+<td align="center">从右边删除1个元素，返回被删除的元素</td>
+</tr>
+<tr>
+<td align="center">lrange 键 开始 结束</td>
+<td align="center">返回指定范围内所有的元素，从左向右索引号0<del>n-1,从右向左索引号-1</del>-n<br/>如果要取列表中所有的元素，索引号从0到-1</td>
+</tr>
+<tr>
+<td align="center">llen 键</td>
+<td align="center">取列表中元素的个数</td>
+</tr>
+</tbody></table></div>
+
+        <h5 id="命令演示-2"   >
+          <a href="#命令演示-2" class="heading-link"><i class="fas fa-link"></i></a><a href="#命令演示-2" class="headerlink" title="命令演示"></a>命令演示</h5>
+      <p>1.向demolist键的列表中，从左边添加a b d三个元素</p>
+<p>2.向demolist键的列表中，从右边添加one two three 三个元素</p>
+<p>3.查询所有的元素</p>
+<p>4.从右边添加一个重复的元素three</p>
+<p>5.删除最右边的元素three</p>
+<p>6.删除最左边的元素d</p>
+<p>7.获取列表中元素的个数</p>
+
+        <h5 id="执行结果-2"   >
+          <a href="#执行结果-2" class="heading-link"><i class="fas fa-link"></i></a><a href="#执行结果-2" class="headerlink" title="执行结果"></a>执行结果</h5>
+      <p><img src="/mdimages/image-20210703120603606.png" alt="image-20210703120603606"></p>
+<p><img src="/mdimages/image-20210703115925268.png" alt="image-20210703115925268"></p>
+
+        <h4 id="set类型"   >
+          <a href="#set类型" class="heading-link"><i class="fas fa-link"></i></a><a href="#set类型" class="headerlink" title="set类型"></a>set类型</h4>
+      <p>在Reids中，我们可以将Set类型看作为没有排序的字符集合，和List类型一样，可以在该类型的数据值上执行添加、删除或判断某一元素是否存在等。</p>
+<p>Set可包含的最大元素数量是4G，和List类型不同的是，Set类型中不允许出现重复的元素。</p>
+
+        <h5 id="常用命令-3"   >
+          <a href="#常用命令-3" class="heading-link"><i class="fas fa-link"></i></a><a href="#常用命令-3" class="headerlink" title="常用命令"></a>常用命令</h5>
+      <div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">sadd 键 元素 元素</td>
+<td align="center">添加1个键和多个元素，返回添加成功的元素个数</td>
+</tr>
+<tr>
+<td align="center">smembers 键</td>
+<td align="center">通过键获取所有的元素</td>
+</tr>
+<tr>
+<td align="center">sismember 键 元素</td>
+<td align="center">判断指定键中元素是否存在，如果存在返回1，否则返回0</td>
+</tr>
+<tr>
+<td align="center">srem 键 元素 元素</td>
+<td align="center">删除指定键中一个或多个元素</td>
+</tr>
+</tbody></table></div>
+
+        <h5 id="命令演示-3"   >
+          <a href="#命令演示-3" class="heading-link"><i class="fas fa-link"></i></a><a href="#命令演示-3" class="headerlink" title="命令演示"></a>命令演示</h5>
+      <p>1.向demoset集合中添加 A B C 1 2 3 6个元素</p>
+<p>2.再向demoset集合中添加B元素，看是否添加成功</p>
+<p>3.查看键为demoset的所有元素，观察添加元素的顺序</p>
+<p>4.删除键为demoset中的C这个元素，再查看结果</p>
+<p>5.判断A是否在demoset集合中</p>
+<p>6.判断C是否在demoset集合中</p>
+
+        <h5 id="执行结果-3"   >
+          <a href="#执行结果-3" class="heading-link"><i class="fas fa-link"></i></a><a href="#执行结果-3" class="headerlink" title="执行结果"></a>执行结果</h5>
+      <p><img src="/mdimages/image-20210703152627731.png" alt="image-20210703152627731"></p>
+
+        <h4 id="zset类型"   >
+          <a href="#zset类型" class="heading-link"><i class="fas fa-link"></i></a><a href="#zset类型" class="headerlink" title="zset类型"></a>zset类型</h4>
+      <p>在Redis中，Sorted Set集合元素是无序的，可以排序，每个元素有一个分数，这个分数决定该元素的顺序。</p>
+
+        <h5 id="常用命令-4"   >
+          <a href="#常用命令-4" class="heading-link"><i class="fas fa-link"></i></a><a href="#常用命令-4" class="headerlink" title="常用命令"></a>常用命令</h5>
+      <div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">zadd 键 分数 元素 分数 元素</td>
+<td align="center">添加1个键和多个带分数的元素，如果元素存在，则更新它的分数</td>
+</tr>
+<tr>
+<td align="center">zcount 键 开始分数 结束分数</td>
+<td align="center">返回指定键分数范围内的元素数量</td>
+</tr>
+<tr>
+<td align="center">zcard 键</td>
+<td align="center">获取一个键在排序集合中的元素数量</td>
+</tr>
+<tr>
+<td align="center">zincrby 键 分数 元素</td>
+<td align="center">对指定键中的排序集合的一个元素设置分数</td>
+</tr>
+<tr>
+<td align="center">zrank 键 元素</td>
+<td align="center">确定在排序集合中元素的索引</td>
+</tr>
+<tr>
+<td align="center">zrem 键 元素 元素</td>
+<td align="center">从排序集合中删除一个或多个元素</td>
+</tr>
+</tbody></table></div>
+
+        <h5 id="命令演示-4"   >
+          <a href="#命令演示-4" class="heading-link"><i class="fas fa-link"></i></a><a href="#命令演示-4" class="headerlink" title="命令演示"></a>命令演示</h5>
+      <p>1.向键为myzset的排序集合中，添加A分数100，B分数50，C分数25</p>
+<p>2.获取键为myzset的排序集合中，分数范围为25到50的元素数量</p>
+<p>3.获取键为myzset的排序集合中的元素数量</p>
+<p>4.在键为myzset的排序集合中，查看B元素的索引</p>
+<p>5.在键为myzset的排序集合中，对C元素设置其分数为75，并查看该元素的索引</p>
+<p>6.在键为myzset的排序集合中，删除B元素</p>
+
+        <h5 id="执行结果-4"   >
+          <a href="#执行结果-4" class="heading-link"><i class="fas fa-link"></i></a><a href="#执行结果-4" class="headerlink" title="执行结果"></a>执行结果</h5>
+      <p><img src="/mdimages/image-20210703160847244.png" alt="image-20210703160847244"></p>
+
+        <h4 id="通用命令"   >
+          <a href="#通用命令" class="heading-link"><i class="fas fa-link"></i></a><a href="#通用命令" class="headerlink" title="通用命令"></a>通用命令</h4>
+      
+        <h5 id="常用命令-5"   >
+          <a href="#常用命令-5" class="heading-link"><i class="fas fa-link"></i></a><a href="#常用命令-5" class="headerlink" title="常用命令"></a>常用命令</h5>
+      <div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">keys 匹配字符</td>
+<td align="center">查找当前数据库中有哪些键，可以使用通配符<br/>* 匹配多个字符<br/>? 匹配1个字符</td>
+</tr>
+<tr>
+<td align="center">del 键1 键2</td>
+<td align="center">删除一个或多个键，无论值是什么类型</td>
+</tr>
+<tr>
+<td align="center">exists 键</td>
+<td align="center">判断指定的键是否存在，存在返回1，不存在返回0</td>
+</tr>
+<tr>
+<td align="center">type 键</td>
+<td align="center">获取指定键的数据类型：string、hash、list、set、zset等</td>
+</tr>
+<tr>
+<td align="center">select 数据库编号</td>
+<td align="center">选择其他的数据库</td>
+</tr>
+<tr>
+<td align="center">move 键 数据库编号</td>
+<td align="center">将一个键和值移到其他的数据库中</td>
+</tr>
+</tbody></table></div>
+
+        <h5 id="命令演示-5"   >
+          <a href="#命令演示-5" class="heading-link"><i class="fas fa-link"></i></a><a href="#命令演示-5" class="headerlink" title="命令演示"></a>命令演示</h5>
+      <p><img src="/mdimages/image-20210703161336918.png" alt="image-20210703161336918"></p>
+
+        <h3 id="redis的持久化方式"   >
+          <a href="#redis的持久化方式" class="heading-link"><i class="fas fa-link"></i></a><a href="#redis的持久化方式" class="headerlink" title="redis的持久化方式"></a>redis的持久化方式</h3>
+      
+        <h4 id="RDB方式"   >
+          <a href="#RDB方式" class="heading-link"><i class="fas fa-link"></i></a><a href="#RDB方式" class="headerlink" title="RDB方式"></a>RDB方式</h4>
+      <p>RDB：Redis DataBase默认的存储方式，数据以二进制的方式保存，每隔一段时间将内存中数据写入到文件中。（文件名称默认是dump.rdb）</p>
+
+        <h5 id="RBD持久化的优点"   >
+          <a href="#RBD持久化的优点" class="heading-link"><i class="fas fa-link"></i></a><a href="#RBD持久化的优点" class="headerlink" title="RBD持久化的优点"></a>RBD持久化的优点</h5>
+      <ul>
+<li><p>方便备份与恢复</p>
+<p>整个Redis数据库将只包含一个文件，默认是dump.rdb，可以非常轻松的将一个单独的文件压缩后转移到其他存储介质上，一旦系统出现灾难性故障，可以非常容易的进行恢复。</p>
+</li>
+<li><p>性能最大化</p>
+<p>对于Redis的服务进程而言，在开始持久化时，它唯一需要做的只是分叉出子进程，由子进程完成这些持久化的工作，这样就可以极大的避免服务进程执行IO操作。</p>
+</li>
+<li><p>启动效率更高</p>
+<p>相对于AOF持久化机制，如果数据集非常大，RDB的启动效率会更高。</p>
+</li>
+</ul>
+
+        <h5 id="RBD持久化的缺点"   >
+          <a href="#RBD持久化的缺点" class="heading-link"><i class="fas fa-link"></i></a><a href="#RBD持久化的缺点" class="headerlink" title="RBD持久化的缺点"></a>RBD持久化的缺点</h5>
+      <ul>
+<li><p>不能完全避免数据丢失</p>
+<p>因为RDB是每隔一段时间写入数据，所以系统一旦在定时持久化之前出现宕机现象，此前没有来得及写入磁盘的数据都将丢失。</p>
+</li>
+<li><p>会导致服务器暂停的现象</p>
+<p>由于RDB是通过子进程来协助完成数据持久化工作的，因此当数据集比较大时，可能会导致整个服务器停止几百毫秒，甚至1秒。</p>
+</li>
+</ul>
+
+        <h5 id="RDB持久化机制的配置"   >
+          <a href="#RDB持久化机制的配置" class="heading-link"><i class="fas fa-link"></i></a><a href="#RDB持久化机制的配置" class="headerlink" title="RDB持久化机制的配置"></a>RDB持久化机制的配置</h5>
+      <p>在redis的redis.conf配置文件中的SNAPSHOTTING中有如下说明：</p>
+<p><img src="/mdimages/image-20210703211859687.png" alt="image-20210703211859687"></p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">语法</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">save &lt;时间间隔&gt; &lt;修改键数&gt;</td>
+<td align="center">设置数据自动保存的时间j间隔<br/>时间间隔：单位是秒<br/>修改键数：增删改键的个数<br/><font color="red">必须是2个条件同时满足的情况下才写入</font></td>
+</tr>
+</tbody></table></div>
+<p>如下是redis配置文件中的RDB方式的持久化时机，<font color="red">必须两个条件都满足的情况下</font>才进行持久化操作。</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">关键字</th>
+<th align="center">时间间隔(秒)</th>
+<th align="center">修改键数</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">save</td>
+<td align="center">3600</td>
+<td align="center">1</td>
+<td align="center">每60分钟修改了1个键</td>
+</tr>
+<tr>
+<td align="center">save</td>
+<td align="center">300</td>
+<td align="center">100</td>
+<td align="center">每5分钟修改了100个键</td>
+</tr>
+<tr>
+<td align="center">save</td>
+<td align="center">60</td>
+<td align="center">10000</td>
+<td align="center">每1分钟修改了1万个键</td>
+</tr>
+</tbody></table></div>
+
+        <h4 id="AOF方式"   >
+          <a href="#AOF方式" class="heading-link"><i class="fas fa-link"></i></a><a href="#AOF方式" class="headerlink" title="AOF方式"></a>AOF方式</h4>
+      <p>AOF: Append Only File 以日志记录的方式将用户的操作和数据写入到文本文件中，文件比较大，还原速度比较慢，数据更加安全。（文件名称默认是appendonly.aof）</p>
+
+        <h5 id="AOF持久化的优点"   >
+          <a href="#AOF持久化的优点" class="heading-link"><i class="fas fa-link"></i></a><a href="#AOF持久化的优点" class="headerlink" title="AOF持久化的优点"></a>AOF持久化的优点</h5>
+      <p>AOF包含一个格式清晰、易于理解的日志文件用于记录所有的修改操作。也可以通过该文件完成数据的重建，该机制可以带来<font color="red">更高的数据安全性，所有的操作都是异步完成的</font>。</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">Redis中提供了3种同步策略</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">每秒同步</td>
+<td align="center">每隔1秒写入一次文件</td>
+</tr>
+<tr>
+<td align="center">每修改同步</td>
+<td align="center">每次修改都写入一次文件</td>
+</tr>
+<tr>
+<td align="center">不同步</td>
+<td align="center">不会写入文件中</td>
+</tr>
+</tbody></table></div>
+
+        <h5 id="AOF持久化的缺点"   >
+          <a href="#AOF持久化的缺点" class="heading-link"><i class="fas fa-link"></i></a><a href="#AOF持久化的缺点" class="headerlink" title="AOF持久化的缺点"></a>AOF持久化的缺点</h5>
+      <ul>
+<li>文件比RDB更大，对于相同数量的数据集而言，AOF文件通常要大于RDB文件。</li>
+<li>运行效率比RDB更慢，根据同步策略的不同，AOF在运行效率上往往会慢于RDB。</li>
+</ul>
+
+        <h5 id="AOF持久化机制的配置"   >
+          <a href="#AOF持久化机制的配置" class="heading-link"><i class="fas fa-link"></i></a><a href="#AOF持久化机制的配置" class="headerlink" title="AOF持久化机制的配置"></a>AOF持久化机制的配置</h5>
+      <p>AOF默认是关闭的，首先需要开启AOF模式</p>
+<p><img src="/mdimages/image-20210703214815203.png" alt="image-20210703214815203"></p>
+<p>在redis的redis.conf配置文件中的APPEND ONLY MODE中有如下说明：</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">参数配置</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">appendonly no/yes</td>
+<td align="center">设置成yes表示打开AOF方式的持久化，如果打开AOF,则RDB持久化方式不起作用。</td>
+</tr>
+</tbody></table></div>
+<p>如下是redis配置文件中的AOF方式的持久化时机</p>
+<p><img src="/mdimages/image-20210703215554099.png" alt="image-20210703215554099"></p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">关键字</th>
+<th align="center">持久化时机</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">appendfsync</td>
+<td align="center">everysec</td>
+<td align="center">每秒同步</td>
+</tr>
+<tr>
+<td align="center">appendfsync</td>
+<td align="center">always</td>
+<td align="center">每修改同步</td>
+</tr>
+<tr>
+<td align="center">appendfsync</td>
+<td align="center">no</td>
+<td align="center">不同步</td>
+</tr>
+</tbody></table></div>
+<p>关于Redis配置的其他信息将在Redis高级篇介绍。</p>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="http://example.com">Clown</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="http://example.com/2021/07/02/Redis%E5%9F%BA%E7%A1%80%E7%AF%87/">http://example.com/2021/07/02/Redis%E5%9F%BA%E7%A1%80%E7%AF%87/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="http://example.com/tags/redis/">redis</a></span></div><nav class="post-paginator paginator"><div class="paginator-next"><a class="paginator-next__link" href="/2021/06/23/JVM%E4%B9%8B%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/"><span class="paginator-prev__text">JVM之逃逸分析</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#redis%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">1.</span> <span class="toc-text">
+          redis是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8redis"><span class="toc-number">2.</span> <span class="toc-text">
+          为什么要使用redis</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E9%AB%98%E5%B9%B6%E5%8F%91%E8%AE%BF%E9%97%AE"><span class="toc-number">2.1.</span> <span class="toc-text">
+          数据库高并发访问</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B5%B7%E9%87%8F%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8"><span class="toc-number">2.2.</span> <span class="toc-text">
+          海量数据存储</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%AF%E6%89%A9%E5%B1%95%E6%80%A7%E5%92%8C%E9%AB%98%E5%8F%AF%E7%94%A8%E6%80%A7"><span class="toc-number">2.3.</span> <span class="toc-text">
+          可扩展性和高可用性</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8redis"><span class="toc-number">3.</span> <span class="toc-text">
+          如何使用redis</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#string%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.1.</span> <span class="toc-text">
+          string字符串类型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-number">3.1.1.</span> <span class="toc-text">
+          常用命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4%E6%BC%94%E7%A4%BA"><span class="toc-number">3.1.2.</span> <span class="toc-text">
+          命令演示</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="toc-number">3.1.3.</span> <span class="toc-text">
+          执行结果</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#hash%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.2.</span> <span class="toc-text">
+          hash类型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4-1"><span class="toc-number">3.2.1.</span> <span class="toc-text">
+          常用命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4%E6%BC%94%E7%A4%BA-1"><span class="toc-number">3.2.2.</span> <span class="toc-text">
+          命令演示</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C-1"><span class="toc-number">3.2.3.</span> <span class="toc-text">
+          执行结果</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#list%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.3.</span> <span class="toc-text">
+          list类型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4-2"><span class="toc-number">3.3.1.</span> <span class="toc-text">
+          常用命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4%E6%BC%94%E7%A4%BA-2"><span class="toc-number">3.3.2.</span> <span class="toc-text">
+          命令演示</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C-2"><span class="toc-number">3.3.3.</span> <span class="toc-text">
+          执行结果</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#set%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.4.</span> <span class="toc-text">
+          set类型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4-3"><span class="toc-number">3.4.1.</span> <span class="toc-text">
+          常用命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4%E6%BC%94%E7%A4%BA-3"><span class="toc-number">3.4.2.</span> <span class="toc-text">
+          命令演示</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C-3"><span class="toc-number">3.4.3.</span> <span class="toc-text">
+          执行结果</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#zset%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.5.</span> <span class="toc-text">
+          zset类型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4-4"><span class="toc-number">3.5.1.</span> <span class="toc-text">
+          常用命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4%E6%BC%94%E7%A4%BA-4"><span class="toc-number">3.5.2.</span> <span class="toc-text">
+          命令演示</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C-4"><span class="toc-number">3.5.3.</span> <span class="toc-text">
+          执行结果</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%9A%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-number">3.6.</span> <span class="toc-text">
+          通用命令</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4-5"><span class="toc-number">3.6.1.</span> <span class="toc-text">
+          常用命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4%E6%BC%94%E7%A4%BA-5"><span class="toc-number">3.6.2.</span> <span class="toc-text">
+          命令演示</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#redis%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96%E6%96%B9%E5%BC%8F"><span class="toc-number">4.</span> <span class="toc-text">
+          redis的持久化方式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RDB%E6%96%B9%E5%BC%8F"><span class="toc-number">4.1.</span> <span class="toc-text">
+          RDB方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#RBD%E6%8C%81%E4%B9%85%E5%8C%96%E7%9A%84%E4%BC%98%E7%82%B9"><span class="toc-number">4.1.1.</span> <span class="toc-text">
+          RBD持久化的优点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#RBD%E6%8C%81%E4%B9%85%E5%8C%96%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="toc-number">4.1.2.</span> <span class="toc-text">
+          RBD持久化的缺点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#RDB%E6%8C%81%E4%B9%85%E5%8C%96%E6%9C%BA%E5%88%B6%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="toc-number">4.1.3.</span> <span class="toc-text">
+          RDB持久化机制的配置</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#AOF%E6%96%B9%E5%BC%8F"><span class="toc-number">4.2.</span> <span class="toc-text">
+          AOF方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#AOF%E6%8C%81%E4%B9%85%E5%8C%96%E7%9A%84%E4%BC%98%E7%82%B9"><span class="toc-number">4.2.1.</span> <span class="toc-text">
+          AOF持久化的优点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#AOF%E6%8C%81%E4%B9%85%E5%8C%96%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="toc-number">4.2.2.</span> <span class="toc-text">
+          AOF持久化的缺点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#AOF%E6%8C%81%E4%B9%85%E5%8C%96%E6%9C%BA%E5%88%B6%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="toc-number">4.2.3.</span> <span class="toc-text">
+          AOF持久化机制的配置</span></a></li></ol></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/icons/avatar.gif" alt="avatar"></div><p class="sidebar-ov-author__text">Persistence is a virtue</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a><a class="sidebar-ov-social-item" href="ql438809495" target="_blank" rel="noopener" data-popover="微信" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-weixin"></i></span></a><a class="sidebar-ov-social-item" href="tencent://message?uin=438809495" target="_blank" rel="noopener" data-popover="social.QQ" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-qq"></i></span></a><a class="sidebar-ov-social-item" href="mailto:438809495@qq.com" target="_blank" rel="noopener" data-popover="social.QQmail" data-popover-pos="up"><span class="sidebar-ov-social-item__icon">QQ 邮箱</span></a></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">9</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">5</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">5</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Clown</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.4.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.6.2</span></div><div class="busuanzi"><span class="busuanzi-siteuv"><span class="busuanzi-siteuv__icon"><i class="fas fa-user"></i></span><span class="busuanzi-siteuv__info">访问人数</span><span class="busuanzi-siteuv__value" id="busuanzi_value_site_uv"></span></span><span class="busuanzi-sitepv"><span class="busuanzi-siteuv__icon"><i class="fas fa-eye"></i></span><span class="busuanzi-siteuv__info">浏览总量</span><span class="busuanzi-siteuv__value" id="busuanzi_value_site_pv"></span></span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><div class="search-mask"></div><div class="search-popup"><span class="search-close"></span><div class="search-input"><input placeholder="搜索文章（支持多关键词，请用空格分隔）"></div><div class="search-results"></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script><script>function initSearch() {
+  var isXML = true;
+  var search_path = 'search.xml';
+
+  if (!search_path) {
+    search_path = 'search.xml';
+  } else if (/json$/i.test(search_path)) {
+    isXML = false;
+  }
+
+  var path = '/' + search_path;
+  $.ajax({
+    url: path,
+    dataType: isXML ? 'xml' : 'json',
+    async: true,
+    success: function (res) {
+      var datas = isXML ? $('entry', res).map(function () {
+        // 将 XML 转为 JSON
+        return {
+          title: $('title', this).text(),
+          content: $('content', this).text(),
+          url: $('url', this).text()
+        };
+      }).get() : res;
+      var $input = $('.search-input input');
+      var $result = $('.search-results');
+      // 搜索对象（标题、内容）的权重，影响显示顺序
+      var WEIGHT = { title: 100, content: 1 };
+      var searchPost = function () {
+        var searchText = $input.val().toLowerCase().trim();
+        // 根据空白字符分隔关键字
+        var keywords = searchText.split(/[\s]+/);
+        // 搜索结果
+        var matchPosts = [];
+
+        // 有多个关键字时，将原文字整个保存下来
+        if (keywords.length > 1) {
+          keywords.push(searchText);
+        }
+        // 防止未输入字符时搜索
+        if (searchText.length > 0) {
+          datas.forEach(function (data) {
+            var isMatch  = false;
+            // 没有标题的文章使用预设的 i18n 变量代替
+            var title = (data.title && data.title.trim()) || '[ 文章无标题 ]';
+            var titleLower = title && title.toLowerCase();
+            // 删除 HTML 标签 和 所有空白字符
+            var content = data.content && data.content.replace(/<[^>]+>/g, '');
+            var contentLower = content && content.toLowerCase();
+            // 删除重复的 /
+            var postURL = data.url && decodeURI(data.url).replace(/\/{2,}/g, '/');
+            // 标题中匹配到的关键词
+            var titleHitSlice = [];
+            // 内容中匹配到的关键词
+            var contentHitSlice = [];
+
+            keywords.forEach(function (keyword) {
+              /**
+              * 获取匹配的关键词的索引
+              * @param {String} keyword 要匹配的关键字
+              * @param {String} text 原文字
+              * @param {Boolean} caseSensitive 是否区分大小写
+              * @param {Number} weight 匹配对象的权重。权重大的优先显示
+              * @return {Array}
+              */
+              function getIndexByword (word, text, caseSensitive, weight) {
+                if (!word || !text) {
+                  return [];
+                };
+
+                var startIndex = 0; // 每次匹配的开始索引
+                var index = -1;     // 匹配到的索引值
+                var result = [];    // 匹配结果
+
+                if (!caseSensitive) {
+                  word = word.toLowerCase();
+                  text = text.toLowerCase();
+                }
+
+                while((index = text.indexOf(word, startIndex)) !== -1) {
+                  var hasMatch = false;
+                  // 索引位置相同的关键词，保留长度较长的
+                  titleHitSlice.forEach(function (hit) {
+                    if (hit.index === index && hit.word.length < word.length) {
+                      hit.word = word;
+                      hasMatch = true;
+                    }
+                  });
+                  startIndex = index + word.length;
+                  !hasMatch && result.push({ index: index, word: word, weight: weight });
+                }
+                return result;
+              }
+              titleHitSlice = titleHitSlice.concat(getIndexByword(keyword, titleLower, false, WEIGHT.title));
+              contentHitSlice = contentHitSlice.concat(getIndexByword(keyword, contentLower, false, WEIGHT.content));
+            });
+
+            var hitTitle = titleHitSlice.length;
+            var hitContent = contentHitSlice.length;
+
+            if (hitTitle > 0 || hitContent > 0) {
+              isMatch = true;
+            }
+            if (isMatch) {
+              ;[titleHitSlice, contentHitSlice].forEach(function (hit) {
+                // 按照匹配文字的索引的递增顺序排序
+                hit.sort(function (left, right) {
+                  return left.index - right.index;
+                });
+              });
+              /**
+              * 给文本中匹配到的关键词添加标记，从而进行高亮显示
+              * @param {String} text 原文本
+              * @param {Array} hitSlice 匹配项的索引信息
+              * @param {Number} start 开始索引
+              * @param {Number} end 结束索引
+              * @return {String}
+              */
+              function highlightKeyword (text, hitSlice, start, end) {
+                if (!text || !hitSlice || !hitSlice.length) {
+                  return;
+                }
+
+                var result = '';
+                var startIndex = start;
+                var endIndex = end;
+                hitSlice.forEach(function (hit) {
+                  if (hit.index < startIndex) {
+                    return;
+                  }
+
+                  var hitWordEnd = hit.index + hit.word.length;
+                  result += text.slice(startIndex, hit.index);
+                  result += '<b>' + text.slice(hit.index, hitWordEnd) + '</b>';
+                  startIndex = hitWordEnd;
+                });
+                result += text.slice(startIndex, endIndex);
+                return result;
+              }
+
+              var postData = {};
+              // 文章总的搜索权重
+              var postWeight = titleHitSlice.length * WEIGHT.title + contentHitSlice.length * WEIGHT.content;
+              // 标记匹配关键词后的标题
+              var postTitle = highlightKeyword(title, titleHitSlice, 0, title.length) || title;
+              // 标记匹配关键词后的内容
+              var postContent;
+              // 显示内容的长度
+              var SHOW_WORD_LENGTH = 200;
+              // 命中关键词前的字符显示长度
+              var SHOW_WORD_FRONT_LENGTH = 20;
+              var SHOW_WORD_END_LENGTH = SHOW_WORD_LENGTH - SHOW_WORD_FRONT_LENGTH;
+
+              // 截取匹配的第一个字符，前后共 200 个字符来显示
+              if (contentHitSlice.length > 0) {
+                var firstIndex = contentHitSlice[0].index;
+                var start = firstIndex > SHOW_WORD_FRONT_LENGTH ? firstIndex - SHOW_WORD_FRONT_LENGTH : 0;
+                var end = firstIndex + SHOW_WORD_END_LENGTH;
+                postContent = highlightKeyword(content, contentHitSlice, start, end);
+              } else { // 未匹配到内容，直接截取前 200 个字符来显示
+                postContent = content.slice(0, SHOW_WORD_LENGTH);
+              }
+              postData.title = postTitle;
+              postData.content = postContent;
+              postData.url = postURL;
+              postData.weight = postWeight;
+              matchPosts.push(postData);
+            }
+          });
+        }
+
+        var resultInnerHtml = '';
+        if (matchPosts.length) {
+          // 按权重递增的顺序排序，使权重大的优先显示
+          matchPosts.sort(function (left, right) {
+            return right.weight - left.weight;
+          });
+          resultInnerHtml += '<ul>';
+          matchPosts.forEach(function (post) {
+            resultInnerHtml += '<li><a class="search-results-title" href="' + post.url + '">';
+            resultInnerHtml += post.title;
+            resultInnerHtml += '</a><div class="search-results-content">';
+            resultInnerHtml += post.content;
+            resultInnerHtml += '</div></li>';
+          });
+          resultInnerHtml += '</ul>';
+        } else {
+          resultInnerHtml += '<div class="search-results-none"><i class="far fa-meh"></i></div>';
+        }
+        $result.html(resultInnerHtml);
+      };
+      $input.on('input', searchPost);
+      $input.on('keyup', function (e) {
+        if (e.keyCode === Stun.utils.codeToKeyCode('Enter')) {
+          searchPost();
+        }
+      });
+    }
+  });
+}
+
+function closeSearch () {
+  $('body').css({ overflow: 'auto' });
+  $('.search-popup').css({ display: 'none' });
+  $('.search-mask').css({ display: 'none' });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  Stun.utils.pjaxReloadLocalSearch = function () {
+    $('.header-nav-search').on('click', function (e) {
+      e.stopPropagation();
+      $('body').css('overflow', 'hidden');
+      $('.search-popup')
+        .velocity('stop')
+        .velocity('transition.expandIn', {
+          duration: 300,
+          complete: function () {
+            $('.search-popup input').focus();
+          }
+        });
+      $('.search-mask')
+        .velocity('stop')
+        .velocity('transition.fadeIn', {
+          duration: 300
+        });
+
+      initSearch();
+    });
+    $('.search-mask, .search-close').on('click', function () {
+      closeSearch();
+    });
+    $(document).on('keydown', function (e) {
+      // Escape <=> 27
+      if (e.keyCode === Stun.utils.codeToKeyCode('Escape')) {
+        closeSearch();
+      }
+    });
+  };
+
+  Stun.utils.pjaxReloadLocalSearch();
+}, false);
+
+function safeOpenUrl(url) {
+  var newTab = window.open();
+  newTab.opener = null;
+  newTab.location = url;
+}
+
+function extSearch(engine) {
+  var engines = {
+    google: 'https://www.google.com/search?q=',
+    bing: 'https://cn.bing.com/search?q=',
+    baidu: 'https://www.baidu.com/s?ie=UTF-8&wd=',
+  };
+  var host = window.location.host;
+  var query = $('.search-input input').val().toLowerCase().trim();
+  var uri = engines[engine] + query + ' site:' + host;
+
+  if (query) {
+    safeOpenUrl(uri);
+  } else {
+    Stun.utils.popAlert('warning', '请输入字符');
+  }
+}
+
+var assistSearchList = window.CONFIG.assistSearch;
+
+if (Array.isArray(assistSearchList)) {
+  assistSearchList.forEach(function (name) {
+    document.querySelector('.search-btns-item--' + name).addEventListener('click', function () {
+      extSearch(name);
+    }, false);
+  });
+}</script><script src="https://cdn.jsdelivr.net/npm/pjax@latest/pjax.min.js"></script><script>window.addEventListener('DOMContentLoaded', function () {
+  var pjax = new Pjax({"selectors":["head title","#main",".pjax-reload"],"history":true,"scrollTo":false,"scrollRestoration":false,"cacheBust":false,"debug":false,"currentUrlFullReload":false,"timeout":0});
+  // 加载进度条的计时器
+  var loadingTimer = null;
+
+  // 重置页面 Y 方向上的滚动偏移量
+  document.addEventListener('pjax:send', function () {
+    $('.header-nav-menu').removeClass('show');
+    if (CONFIG.pjax && CONFIG.pjax.avoidBanner) {
+      $('html').velocity('scroll', {
+        duration: 500,
+        offset: $('#header').height(),
+        easing: 'easeInOutCubic'
+      });
+    }
+
+    var loadingBarWidth = 20;
+    var MAX_LOADING_WIDTH = 95;
+
+    $('.loading-bar').addClass('loading');
+    $('.loading-bar__progress').css('width', loadingBarWidth + '%');
+    clearInterval(loadingTimer);
+    loadingTimer = setInterval(function () {
+      loadingBarWidth += 3;
+      if (loadingBarWidth > MAX_LOADING_WIDTH) {
+        loadingBarWidth = MAX_LOADING_WIDTH;
+      }
+      $('.loading-bar__progress').css('width', loadingBarWidth + '%');
+    }, 500);
+  }, false);
+
+  window.addEventListener('pjax:complete', function () {
+    clearInterval(loadingTimer);
+    $('.loading-bar__progress').css('width', '100%');
+    $('.loading-bar').removeClass('loading');
+    setTimeout(function () {
+      $('.loading-bar__progress').css('width', '0');
+    }, 400);
+    $('link[rel=prefetch], script[data-pjax-rm]').each(function () {
+      $(this).remove();
+    });
+    $('script[data-pjax], #pjax-reload script').each(function () {
+      $(this).parent().append($(this).remove());
+    });
+
+    if (Stun.utils.pjaxReloadBoot) {
+      Stun.utils.pjaxReloadBoot();
+    }
+    if (Stun.utils.pjaxReloadScroll) {
+      Stun.utils.pjaxReloadScroll();
+    }
+    if (Stun.utils.pjaxReloadSidebar) {
+      Stun.utils.pjaxReloadSidebar();
+    }
+    if (false) {
+      if (Stun.utils.pjaxReloadHeader) {
+        Stun.utils.pjaxReloadHeader();
+      }
+      if (Stun.utils.pjaxReloadScrollIcon) {
+        Stun.utils.pjaxReloadScrollIcon();
+      }
+      if (Stun.utils.pjaxReloadLocalSearch) {
+        Stun.utils.pjaxReloadLocalSearch();
+      }
+    }
+  }, false);
+}, false);</script><div id="pjax-reload"><script src="https://cdn.jsdelivr.net/gh/sukkaw/busuanzi@latest/bsz.pure.mini.js" async></script></div><script src="/js/utils.js?v=2.6.2"></script><script src="/js/stun-boot.js?v=2.6.2"></script><script src="/js/scroll.js?v=2.6.2"></script><script src="/js/header.js?v=2.6.2"></script><script src="/js/sidebar.js?v=2.6.2"></script><script type="application/json" src="/search.xml"></script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body></html>
