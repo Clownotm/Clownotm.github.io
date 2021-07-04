@@ -1693,4 +1693,72 @@
         <tag>redis</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Redis安装篇</title>
+    <url>/2021/07/03/Redis%E5%AE%89%E8%A3%85%E7%AF%87/</url>
+    <content><![CDATA[
+        <h3 id="Linux环境安装Redis"   >
+          <a href="#Linux环境安装Redis" class="heading-link"><i class="fas fa-link"></i></a><a href="#Linux环境安装Redis" class="headerlink" title="Linux环境安装Redis"></a>Linux环境安装Redis</h3>
+      <p>官网下载地址：<span class="exturl"><a class="exturl__link"   href="https://redis.io/download" >Redis</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
+<p>本篇将介绍Linux环境下Redis6.2.4单机版的安装。</p>
+<p>1.选择Stable(6.2)下的Download 6.2.4 链接进行下载 （stable是稳定版本，默认下载的是linux版本）</p>
+<p><img src="/mdimages/image-20210704133052734.png" alt="image-20210704133052734"></p>
+<p>2.下载完成之后，使用XShell或其他客户端工具把下载好的Redis压缩包上传到Linux的/opt文件目录下</p>
+<p><img src="/mdimages/image-20210704135556899.png" alt="image-20210704135556899"></p>
+<p>3.使用XShell连接到Linux服务器，进入到opt目录下，解压redis-6.2.4.tar.gz到/usr/local 目录下</p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">[root@localhost /]# cd /opt             //进入opt文件目录</span><br><span class="line"></span><br><span class="line">[root@localhost opt]# tar -zxvf redis-6.2.4.tar.gz  -C /usr/local/    //解压redis-6.2.4.tar.gz到/usr/local 目录</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+
+<p>4.由于Redis是由C语言编写的，它的运行需要C环境，所以我们需要先安装gcc，安装命令如下：</p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">[root@localhost opt]# yum install gcc-c++</span><br></pre></td></tr></table></div></figure>
+
+<p>5.进入到/usr/local/redis-6.2.4/目录下，进行编译和安装</p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">[root@localhost opt]# cd /usr/local/redis-6.2.4/</span><br><span class="line"></span><br><span class="line">[root@localhost redis-6.2.4]# make             //对解压后的文件进行编译</span><br><span class="line"></span><br><span class="line">[root@localhost redis-6.2.4]# cd src/          //进入到redis-6.2.4/src 文件目录下</span><br><span class="line"></span><br><span class="line">[root@localhost src]# make install            //redis安装</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+
+<p>6.为了方便管理，将Redis的配置文件移动到etc文件夹中，常用命令移动到bin文件夹中</p>
+<ul>
+<li><p>首先创建bin和etc文件夹</p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">[root@localhost redis-6.2.4]# mkdir bin       //创建bin文件夹</span><br><span class="line"></span><br><span class="line">[root@localhost redis-6.2.4]# mkdir etc       //创建etc文件夹</span><br></pre></td></tr></table></div></figure></li>
+<li><p>将redis-6.2.4目录下的redis.conf 移动到 redis-6.2.4目录下的etc文件夹下</p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">[root@localhost redis-6.2.4]# mv redis.conf ./etc/ </span><br></pre></td></tr></table></div></figure></li>
+<li><p>将redis-6.2.4目录下的将mkreleasehdr.sh、redis-benchmark、redis-check-aof、redis-cli、redis-server 移动到 redis-6.2.4目录下的bin文件夹下</p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">[root@localhost redis-6.2.4]# cd src     //进入redis-6.2.4目录下的src文件夹下</span><br><span class="line">[root@localhost src]# mv mkreleasehdr.sh redis-benchmark redis-check-aof redis-cli redis-server /usr/local/redis-6.2.4/bin/</span><br></pre></td></tr></table></div></figure></li>
+</ul>
+<p>7.进入到/usr/local/redis-6.2.4/etc 目录下，编辑redis.conf配置文件，设置成后台启动redis服务</p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">[root@localhost src]# cd /usr/local/redis-6.2.4/etc</span><br><span class="line">[root@localhost etc]# vim redis.conf</span><br></pre></td></tr></table></div></figure>
+
+<p>把配置文件中的daemonize属性修改为yes(表示开启后台运行)</p>
+<p><img src="/mdimages/image-20210704142830383.png" alt="image-20210704142830383"></p>
+<p>8.编辑redis.conf配置文件，开启redis远程访问服务</p>
+<p><img src="/mdimages/image-20210704143312727.png" alt="image-20210704143312727"></p>
+<ul>
+<li>将redis.conf配置文件中的bind 127.0.0.1 这一行注释掉，这里bind指的是只有指定的网段才能远程访问这个redis服务，注释掉后，就没有限制了。</li>
+</ul>
+<p><img src="/mdimages/image-20210704143755751.png" alt="image-20210704143755751"></p>
+<ul>
+<li>默认启用保护模式，如果允许其他客户端连接到Redis服务,即使没有配置身份验证，也没有使用bind指令显示的列出特定的网段，那么需要将redis.conf配置文件中的protected-mode 设置成no（默认是设置成yes，防止了远程访问，在redis3.2.3版本后）这里根据实际情况去配置即可，如果是本地使用不需要修改。</li>
+</ul>
+<p>9.编辑redis.conf配置文件，修改Redis默认密码(默认密码为空)</p>
+<p><img src="/mdimages/image-20210704144920039.png" alt="image-20210704144920039"></p>
+<p>在配置文件中找到# requirepass foobared 这一行，删除前面的注释符号#，并把foobared修改成自己设置的密码，或者另起一行requirepass 密码。</p>
+<p>10.设置Redis开机自启动</p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">[root@localhost etc]# vim /etc/rc.d/rc.local</span><br></pre></td></tr></table></div></figure>
+
+<p>添加如下代码到 /etc/rc.d/rc.local 中：</p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">/usr/local/redis-6.2.4/bin/redis-server  /usr/local/redis-6.2.4/etc/redis.conf</span><br></pre></td></tr></table></div></figure>
+
+<p>11.切换到/usr/local/redis-6.2.4/bin 目录下执行redis-serve 命令，使用/usr/local/redis-6.2.4/etc/redis.conf 配置文件来启动redis服务</p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">[root@localhost etc]# cd /usr/local/redis-6.2.4/bin</span><br><span class="line">[root@localhost bin]# ls</span><br><span class="line">dump.rdb  mkreleasehdr.sh  redis-benchmark  redis-check-aof  redis-cli  redis-server</span><br><span class="line">[root@localhost bin]# ./redis-server /usr/local/redis-6.2.4/etc/redis.conf</span><br></pre></td></tr></table></div></figure>
+
+<p>12.使用Redis自带的客户端工具redis-cli 测试连接 或者 使用RedisDesktopManager图形化工具测试连接</p>
+<p><img src="/mdimages/image-20210704150104809.png" alt="image-20210704150104809"></p>
+<p><img src="/mdimages/image-20210704150234966.png" alt="image-20210704150234966"></p>
+<p>至此Redis单机版安装完毕。</p>
+]]></content>
+      <categories>
+        <category>redis</category>
+      </categories>
+      <tags>
+        <tag>redis</tag>
+      </tags>
+  </entry>
 </search>
