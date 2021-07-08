@@ -1763,4 +1763,222 @@
         <tag>redis</tag>
       </tags>
   </entry>
+  <entry>
+    <title>JDK工具介绍与使用</title>
+    <url>/2021/07/08/JDK%E5%B7%A5%E5%85%B7%E4%BB%8B%E7%BB%8D%E4%B8%8E%E4%BD%BF%E7%94%A8/</url>
+    <content><![CDATA[
+        <h2 id="JDK工具"   >
+          <a href="#JDK工具" class="heading-link"><i class="fas fa-link"></i></a><a href="#JDK工具" class="headerlink" title="JDK工具"></a>JDK工具</h2>
+      <p>在JDK的bin目录下其实有很多的命令行工具：</p>
+<p><img src="/mdimages/image-20210708142518187.png" alt="image-20210708142518187"></p>
+<p>我们经常接触的命令有javac编译、java运行，而对其它命令是比较少接触的，其实还有很多的命令是非常强大的，我们可以借助这些命令去监控和分析我们的应用程序，如查看JVM参数，内存使用情况及分析等等。</p>
+<p>下面将介绍几个比较常用的命令：</p>
+<ul>
+<li>jps：查看本机java进程信息。</li>
+<li>jstack：打印<font color="red">线程的栈信息</font>，生成<font color="red">线程dump文件。</font></li>
+<li>jmap：打印<font color="red">内存映射信息</font>，生成<font color="red">堆dump文件</font>。</li>
+<li>jstat：性能监控工具。</li>
+<li>jinfo：查看java运行程序的扩展参数，支持在运行时动态地更改部分参数。</li>
+<li>jcmd：可以用来导出堆信息，查看java进程，导出线程信息，执行GC等，jcmd拥有jmap的大部分功能，Oracle官方建议使用jcmd代替jmap。</li>
+</ul>
+<span id="more"></span>
+
+
+        <h3 id="jps命令"   >
+          <a href="#jps命令" class="heading-link"><i class="fas fa-link"></i></a><a href="#jps命令" class="headerlink" title="jps命令"></a>jps命令</h3>
+      <figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">jps 显示当前所有java进程pid的命令</span><br><span class="line">jps -l 输出应用程序main.class的完整package名或者应用程序jar文件完整路径名</span><br><span class="line">jps -v 输出传递给JVM的参数</span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="jstack命令"   >
+          <a href="#jstack命令" class="heading-link"><i class="fas fa-link"></i></a><a href="#jstack命令" class="headerlink" title="jstack命令"></a>jstack命令</h3>
+      <p>主要用于生成指定进程当前时刻的线程快照，线程快照是当前java虚拟机每一条线程正在执行的方法堆栈的集合，<br>生成线程快照的主要目的是用于定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致长时间等待。</p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">jstack命令查看线程堆栈信息时可能会看到的线程的几种状态：</span><br><span class="line">NEW,未启动的。不会出现在Dump中。</span><br><span class="line">RUNNABLE,在虚拟机内执行的。运行中状态，可能里面还能看到locked字样，表明它获得了某把锁。</span><br><span class="line">BLOCKED,受阻塞并等待监视器锁。被某个锁(synchronizers)給block住了。</span><br><span class="line">WATING,无限期等待另一个线程执行特定操作。等待某个condition或monitor发生，一般停留在park(), wait(), sleep(),join() 等语句里。</span><br><span class="line">TIMED_WATING,有时限的等待另一个线程的特定操作。和WAITING的区别是wait() 等语句加上了时间限制 wait(timeout)。</span><br><span class="line">TERMINATED,已退出的。</span><br></pre></td></tr></table></div></figure>
+
+<p>top命令查看对应的java进程ID<pid>；</p>
+<p><img src="/mdimages/image-20210528154215890.png" alt="image-20210528154215890"></p>
+<p>top -Hp <pid> 查看进程中的线程状态（根据%CPU占用的百分比，判断哪个线程CPU占用过高）；</p>
+<p><img src="/mdimages/image-20210528154310715.png" alt="image-20210528154310715"></p>
+<p>通过上面的命令查询出对应进程中占用CPU过高的线程ID，然后使用以下命令转换为十六进制数，<br>echo ‘obase=16; ibase=10; <pid>‘ | bc | tr ‘[A-Z]’ ‘[a-z]’</p>
+<p><img src="/mdimages/image-20210528154504023.png" alt="image-20210528154504023">jstack <pid> &gt; <path> 根据进程ID将线程快照信息输出到指定path（如：jstack 10859 &gt; /tmp/threaddump<br>)；<br>部分线程快照信息如下：</p>
+<p><img src="/mdimages/image-20210528155942987.png" alt="image-20210528155942987"></p>
+<p>例：根据算出的线程ID 2c12到线程快照文件搜索，查到nid = 0x2c12。</p>
+
+        <h3 id="jmap命令"   >
+          <a href="#jmap命令" class="heading-link"><i class="fas fa-link"></i></a><a href="#jmap命令" class="headerlink" title="jmap命令"></a>jmap命令</h3>
+      <p>主要用于打印指定java进程的共享对象内存映射或堆内存信息。</p>
+<p>【<strong>堆Dump是反映堆使用情况的内存镜像，其中主要包括系统信息、虚拟机属性、完整的线程Dump、所有类和对象的状态等。一般在内存不足，GC异常等情况下，怀疑内存泄漏，这个时候就会去输出堆Dump文件。】</strong></p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">指令格式：jmap - [option] [pid]</span><br><span class="line">option:</span><br><span class="line">no option： 查看进程的内存映像信息,类似 Solaris pmap 命令。【jmap 10859】</span><br><span class="line">heap： 显示Java堆详细信息。【jmap -heap 10859】</span><br><span class="line">histo[:live]： 显示堆中对象的统计信息。【 jmap -histo:live 10859】</span><br><span class="line">clstats：打印类加载器信息。【jmap -clstats 10859】</span><br><span class="line">备注：-clstats是-permstat的替代方案，在JDK8之前，-permstat用来打印类加载器的数据</span><br><span class="line">打印Java堆内存的永久保存区域的类加载器的智能统计信息。对于每个类加载器而言，它的名称、活跃度、地址、父类加载器、它所加载的类的数量和大小都会被打印。此外，包含的字符串数量和大小也会被打印。</span><br><span class="line">finalizerinfo： 显示在F-Queue队列等待Finalizer线程执行finalizer方法的对象。【jmap -finalizerinfo 10859】</span><br><span class="line">dump:&lt;dump-options&gt;：生成堆转储快照。【jmap -dump:format=b,file=生成文件的路径 pid】</span><br><span class="line">备注：例jmap -dump:format=b,file=/usr/landray/kmss/resource/heapdump.hprof 29879</span><br><span class="line">F： 当-dump没有响应时，使用-dump或者-histo参数. 在这个模式下,live子参数无效。</span><br><span class="line">help：打印帮助信息。【jmap -help】</span><br><span class="line">J&lt;flag&gt;：指定传递给运行jmap的JVM的参数。</span><br></pre></td></tr></table></div></figure>
+
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">jmap -heap 10859命令信息详解</span><br><span class="line">using thread-local object allocation.</span><br><span class="line">Parallel GC with 8 thread(s)                //并行垃圾回收器8个线程</span><br><span class="line"></span><br><span class="line">Heap Configuration:                         //堆内存初始化配置</span><br><span class="line">   MinHeapFreeRatio = 0                     //堆最小空闲比率</span><br><span class="line">   MaxHeapFreeRatio = 100                   //堆最大空闲比率</span><br><span class="line">   MaxHeapSize      = 4294967296 (4096.0MB) //堆最大内存大小</span><br><span class="line">   NewSize          = 268435456 (256.0MB)   //堆新生代的默认内存大小</span><br><span class="line">   MaxNewSize       = 268435456 (256.0MB)   //堆新生代的最大内存大小</span><br><span class="line">   OldSize          = 5439488 (5.1875MB)    //老年代的大小</span><br><span class="line">   NewRatio         = 2                     //新生代和老年代的大小比率</span><br><span class="line">   SurvivorRatio    = 8                     //年轻代中的Eden区与Survivor区的大小比率</span><br><span class="line">   PermSize         = 268435456 (256.0MB)   //永久代的初始大小</span><br><span class="line">   MaxPermSize      = 536870912 (512.0MB)   //永久代的最大大小</span><br><span class="line">   G1HeapRegionSize = 0 (0.0MB)             //G1垃圾收集器region区的大小</span><br><span class="line"></span><br><span class="line">Heap Usage:                                 //堆内存使用情况</span><br><span class="line">PS Young Generation                         //新生代内存使用情况 </span><br><span class="line">Eden Space:                                 //Eden区的内存分布</span><br><span class="line">   capacity = 266338304 (254.0MB)           //总大小</span><br><span class="line">   used     = 61499808 (58.650787353515625MB)//已使用大小</span><br><span class="line">   free     = 204838496 (195.34921264648438MB)//空闲大小</span><br><span class="line">   23.090861162801428% used                   //已使用百分比</span><br><span class="line">From Space:                                   //Survivor区（S0）的内存分布</span><br><span class="line">   capacity = 1048576 (1.0MB)</span><br><span class="line">   used     = 196608 (0.1875MB)</span><br><span class="line">   free     = 851968 (0.8125MB)</span><br><span class="line">   18.75% used</span><br><span class="line">To Space:                                     //Survivor区（S1）的内存分布</span><br><span class="line">   capacity = 1048576 (1.0MB)</span><br><span class="line">   used     = 0 (0.0MB)</span><br><span class="line">   free     = 1048576 (1.0MB)</span><br><span class="line">   0.0% used</span><br><span class="line">PS Old Generation                             //老年代的内存分布</span><br><span class="line">   capacity = 805306368 (768.0MB)</span><br><span class="line">   used     = 550712192 (525.2000732421875MB)</span><br><span class="line">   free     = 254594176 (242.7999267578125MB)</span><br><span class="line">   68.38542620340984% used</span><br><span class="line">PS Perm Generation                             //永久代的内存分布</span><br><span class="line">   capacity = 402653184 (384.0MB)</span><br><span class="line">   used     = 206356648 (196.79703521728516MB)</span><br><span class="line">   free     = 196296536 (187.20296478271484MB)</span><br><span class="line">   51.24922792116801% used</span><br></pre></td></tr></table></div></figure>
+
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">jmap -histo 14596命令信息详解</span><br><span class="line"> num     #instances         #bytes  class name</span><br><span class="line">----------------------------------------------</span><br><span class="line">   1:         89650       32637720  [B</span><br><span class="line">   2:        160971       20716296  [C</span><br><span class="line">   3:         16744        9498400  [I</span><br><span class="line">   4:         86693        2080632  java.lang.String</span><br><span class="line">   5:         90310        1782328  [Ljava.lang.Class;</span><br><span class="line">   6:         24473        1314520  [Ljava.lang.Object;</span><br><span class="line">   7:         14936        1314368  java.lang.reflect.Method</span><br><span class="line">   8:          7628         839800  java.lang.Class</span><br><span class="line">   9:         18658         597056  java.util.concurrent.ConcurrentHashMap$Node</span><br><span class="line">  10:          6682         535872  [Ljava.util.HashMap$Node;</span><br><span class="line">  11:         11587         463480  java.util.LinkedHashMap$Entry</span><br><span class="line">  12:         13838         442816  java.util.HashMap$Node</span><br><span class="line">  13:          5624         440384  [S</span><br><span class="line">  14:          7013         392728  java.util.LinkedHashMap</span><br><span class="line">  15:         16276         390624  java.lang.StringBuilder</span><br><span class="line">  16:          6218         348208  jdk.internal.org.objectweb.asm.Item</span><br><span class="line">  17:         12152         291648  java.util.concurrent.CopyOnWriteArrayList$COWIterator</span><br><span class="line">  打印的信息分别是：序列号、对象的数量、这些对象的内存占用大小、这些对象所属的类和全限定名</span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="jstat命令"   >
+          <a href="#jstat命令" class="heading-link"><i class="fas fa-link"></i></a><a href="#jstat命令" class="headerlink" title="jstat命令"></a>jstat命令</h3>
+      <p>主要是对java应用程序的资源和性能进行实时的命令行监控，包括了对heap size和垃圾回收状况的监控。</p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">指令格式：jstat -&lt;option&gt; [-t] [-h&lt;lines&gt;] &lt;vmid&gt; [&lt;interval&gt; [&lt;count&gt;]]</span><br><span class="line">option：常用选项有gc、gcutil。</span><br><span class="line">[-t]:可选项，显示TimeStamp时间戳。【jstat -gc -t 14596 1000 5】</span><br><span class="line">[-h&lt;lines&gt;]：可选项，每打印lines行数据后，重新显示列标题行。【jstat -gc -h3 14596 1000 5】</span><br><span class="line">vmid：java进程id。</span><br><span class="line">interval：间隔时间，单位为毫秒。</span><br><span class="line">count：打印次数。</span><br></pre></td></tr></table></div></figure>
+
+<p>option参数选项：</p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">-class 显示ClassLoad的相关信息；</span><br><span class="line">-compiler 显示JIT编译的相关信息；</span><br><span class="line">-gc 显示和gc相关的堆信息；</span><br><span class="line">-gccapacity 　显示各个代的容量以及使用情况；</span><br><span class="line">-gcmetacapacity 显示metaspace的大小</span><br><span class="line">-gcnew 显示新生代信息；</span><br><span class="line">-gcnewcapacity 显示新生代大小和使用情况；</span><br><span class="line">-gcold 显示老年代和永久代的信息；</span><br><span class="line">-gcoldcapacity 显示老年代的大小；</span><br><span class="line">-gcutil　 显示垃圾收集信息；</span><br><span class="line">-gccause 显示垃圾回收的相关信息（同-gcutil）,同时显示最后一次或当前正在发生的垃圾回收的诱因；</span><br><span class="line">-printcompilation 输出JIT编译的方法信息；</span><br></pre></td></tr></table></div></figure>
+
+<p><img src="/mdimages/image-20210528173814565.png" alt="image-20210528173814565"></p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">jstat -gc 10859 5000 20 命令输出内容详解：</span><br><span class="line">S0C: 年轻代第一个survivor的容量（字节）</span><br><span class="line">S1C：年轻代第二个survivor的容量（字节）</span><br><span class="line">S0U：年轻代第一个survivor已使用的容量（字节）</span><br><span class="line">S1U：年轻代第二个survivor已使用的容量（字节）</span><br><span class="line">EC：年轻代中Eden的空间（字节）</span><br><span class="line">EU：年代代中Eden已使用的空间（字节）</span><br><span class="line">OC：老年代的容量（字节）</span><br><span class="line">OU: 老年代中已使用的空间（字节）</span><br><span class="line">PC：永久代的容量</span><br><span class="line">PU：永久代已使用的容量</span><br><span class="line">YGC：从应用程序启动到采样时年轻代中GC的次数</span><br><span class="line">YGCT:从应用程序启动到采样时年轻代中GC所使用的时间（单位：S）</span><br><span class="line">FGC：从应用程序启动到采样时老年代中GC（FULL GC）的次数</span><br><span class="line">FGCT：从应用程序启动到采样时老年代中GC所使用的时间（单位：S）</span><br><span class="line">GCT：从应用程序启动到采样时gc的总时间。</span><br></pre></td></tr></table></div></figure>
+
+<p><img src="/mdimages/image-20210528175226566.png" alt="image-20210528175226566"></p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">jstat -gcutil 10859 5000 20 命令输出内容详解：</span><br><span class="line">s0:年轻代中第一个survivor已使用的占当前容量百分比</span><br><span class="line">s1:年轻代中第二个survivor已使用的占当前容量百分比</span><br><span class="line">E:年轻代中Eden已使用的占当前容量百分比</span><br><span class="line">O:老年代中已使用的占当前容量百分比</span><br><span class="line">P:永久代中已使用的占当前容量百分比</span><br><span class="line">YGC ：从应用程序启动到采样时年轻代中gc次数</span><br><span class="line">YGCT ：从应用程序启动到采样时年轻代中gc所用时间(s)</span><br><span class="line">FGC ：从应用程序启动到采样时old代(全gc)gc次数</span><br><span class="line">FGCT ：从应用程序启动到采样时old代(全gc)gc所用时间(s)</span><br><span class="line">GCT：从应用程序启动到采样时gc用的总时间(s)</span><br></pre></td></tr></table></div></figure>
+
+<p><img src="/mdimages/image-20210528180125327.png" alt="image-20210528180125327"></p>
+<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="code"><pre><span class="line">jstat -class 10859 命令输出内容详解：</span><br><span class="line">显示加载class的数量，及所占空间等信息。</span><br><span class="line">Loaded : 已经装载的类的数量</span><br><span class="line">Bytes : 装载类所占用的字节数</span><br><span class="line">Unloaded：已经卸载类的数量</span><br><span class="line">Bytes：卸载类的字节数</span><br><span class="line">Time：装载和卸载类所花费的时间</span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="jinfo命令"   >
+          <a href="#jinfo命令" class="heading-link"><i class="fas fa-link"></i></a><a href="#jinfo命令" class="headerlink" title="jinfo命令"></a>jinfo命令</h3>
+      <p>jinfo可以用来查看正在运行的java运用程序的扩展参数，甚至支持在运行时动态地更改部分参数。</p>
+<p>使用语法：jinfo   -<option>  <pid></p>
+<p>option可以为以下信息：</p>
+<p>​          -flag<name>: 打印指定java虚拟机的参数值</p>
+<p>​         -flag [+|-]<name>：设置或取消指定java虚拟机参数的布尔值</p>
+<p>​         -flag <name>=<value>：设置指定java虚拟机的参数的值</p>
+<p>常用的参数名<name>：</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PrintGCDetails</td>
+<td>是否打印GC收集细节</td>
+</tr>
+<tr>
+<td>SurvivorRatio</td>
+<td>设置新生代中eden和S0/S1空间的比例，默认8:1:1，SurvivorRatio值就是设置eden区的比例占多少，S0/S1相同</td>
+</tr>
+<tr>
+<td>NewRatio</td>
+<td>配置年轻代与老年代在堆结构的占比，默认-XX:NewRatio=2新生代占1,老年代2,年轻代占整个堆的1/3，NewRatio值就是设置老年代的占比，剩下的1给新生代</td>
+</tr>
+<tr>
+<td>InitialHeapSize（等价于Xms）</td>
+<td>初始堆大小内存，默认为物理内存1/64</td>
+</tr>
+<tr>
+<td>MaxHeapSize（等价于Xmx）</td>
+<td>堆最大分配内存，默认为物理内存的1/4</td>
+</tr>
+<tr>
+<td>ThreadStackSize（等价于Xss）</td>
+<td>设置单个线程栈的大小，一般默认为512k~1024k</td>
+</tr>
+<tr>
+<td>MaxNewSize（等价于Xmn）</td>
+<td>设置年轻代大小</td>
+</tr>
+<tr>
+<td>MetaspaceSize</td>
+<td>设置元空间大小，JDK1.7永久代，JDK1.8之后元空间；没配置，默认20多M</td>
+</tr>
+<tr>
+<td>MaxTenuringThreshold</td>
+<td>设置转入老年代的存活次数。如果是0，则直接跳过新生代进入老年代</td>
+</tr>
+<tr>
+<td>PermSize</td>
+<td>设置永久代最小大小（Java8以前）</td>
+</tr>
+<tr>
+<td>MaxPermSize</td>
+<td>设置永久代最大大小（Java8以前）</td>
+</tr>
+<tr>
+<td>MetaspaceSize</td>
+<td>分别设置元空间最小大小（Java8以后）</td>
+</tr>
+<tr>
+<td>MaxMetaspaceSize</td>
+<td>分别设置元空间最大大小（Java8以后）</td>
+</tr>
+</tbody></table></div>
+<p>使用示例：</p>
+<p>​      1. 显示新生代对象晋升到老年代对象的最大年龄。</p>
+<p><img src="/mdimages/image-20210607144631814.png" alt="image-20210607144631814"></p>
+<p>​      2.显示是否开启打印GC详细信息。</p>
+<p><img src="/mdimages/image-20210607144710401.png" alt="image-20210607144710401"></p>
+<p>​      3.在应用程序运行时动态打开打印详细GC信息开关。</p>
+<p><img src="/mdimages/image-20210607145016660.png" alt="image-20210607145016660"></p>
+<p>注意：jinfo虽然可以在java程序运行时动态地修改虚拟机参数，但并不是所有的参数都支持动态修改。</p>
+
+        <h3 id="jcmd命令"   >
+          <a href="#jcmd命令" class="heading-link"><i class="fas fa-link"></i></a><a href="#jcmd命令" class="headerlink" title="jcmd命令"></a>jcmd命令</h3>
+      <p>在JDK 1.7之后，新增了一个命令行工具jcmd。它是一个多功能工具，可以用来导出堆，查看java进程，导出线程信息，执行GC等。jcmd拥有jmap的大部分功能，Oracle官方建议使用jcmd代替jmap。</p>
+<p>使用语法：jcmd <pid> <command></p>
+<p>jcmd命令拥有jps命令的功能，可以查看当前运行的所有虚拟机，如：</p>
+<p><img src="/mdimages/image-20210708145956275.png" alt="image-20210708145956275"></p>
+<p>jcmd命令对于每一个虚拟机使用help命令可以列出该虚拟机支持的所有命令，如：</p>
+<p><img src="/mdimages/image-20210708150329736.png" alt="image-20210708150329736"></p>
+<p>常见子命令说明：</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">子命令<command></th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Thread.print</td>
+<td align="center">打印线程栈信息</td>
+</tr>
+<tr>
+<td align="center">GC.class_histogram</td>
+<td align="center">查看系统中类统计信息</td>
+</tr>
+<tr>
+<td align="center">GC.heap_dump</td>
+<td align="center">导出堆内存，与jmap -dump功能一样</td>
+</tr>
+<tr>
+<td align="center">GC.run_finalization</td>
+<td align="center">触发finalize()</td>
+</tr>
+<tr>
+<td align="center">GC.run</td>
+<td align="center">触发gc()</td>
+</tr>
+<tr>
+<td align="center">VM.uptime</td>
+<td align="center">VM启动时间</td>
+</tr>
+<tr>
+<td align="center">VM.flags</td>
+<td align="center">获取JVM启动参数</td>
+</tr>
+<tr>
+<td align="center">VM.system_properties</td>
+<td align="center">获取系统属性Properties</td>
+</tr>
+<tr>
+<td align="center">VM.command_line</td>
+<td align="center">获取启动时命令行指定的参数</td>
+</tr>
+<tr>
+<td align="center">VM.version</td>
+<td align="center">获取JVM的版本</td>
+</tr>
+<tr>
+<td align="center">help</td>
+<td align="center">帮助</td>
+</tr>
+</tbody></table></div>
+<p>示例：</p>
+<p><img src="/mdimages/image-20210708152244170.png" alt="image-20210708152244170"></p>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
 </search>
