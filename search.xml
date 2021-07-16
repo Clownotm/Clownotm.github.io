@@ -2223,4 +2223,145 @@
         <tag>JVM</tag>
       </tags>
   </entry>
+  <entry>
+    <title>类加载器</title>
+    <url>/2021/07/17/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8/</url>
+    <content><![CDATA[
+        <h3 id="类加载器"   >
+          <a href="#类加载器" class="heading-link"><i class="fas fa-link"></i></a><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h3>
+      <p>类加载器是<b>负责加载.class文件</b>的，将class文件字节码内容加载到内存中，并将这些内容转换成方法区中的运行时数据结构，并且ClassLoader只负责class文件的加载，是否能够运行则由Execution Engine(执行引擎)决定。</p>
+<p><img src="/mdimages/image-20210716102040395.png" alt="image-20210716102040395"></p>
+
+        <h3 id="类加载器的流程"   >
+          <a href="#类加载器的流程" class="heading-link"><i class="fas fa-link"></i></a><a href="#类加载器的流程" class="headerlink" title="类加载器的流程"></a>类加载器的流程</h3>
+      <p>从类被加载到虚拟机内存中开始，到释放内存总共有7个步骤：加载，验证，准备，解析，初始化，使用，卸载。其中<b>验证，准备，解析</b>三个步骤统称为连接。</p>
+<p><img src="/mdimages/image-20210716105552793.png" alt="image-20210716105552793"></p>
+<span id="more"></span>
+
+<ol>
+<li><p>加载</p>
+<ul>
+<li>将class文件加载到虚拟机内存中</li>
+<li>将静态数据结构转化成方法区中运行时的数据结构</li>
+<li>在堆中生成一个代表这个类的java.lang.Class对象作为数据访问的入口</li>
+</ul>
+</li>
+<li><p>连接</p>
+<ul>
+<li><p>验证：确保加载的类符合JVM规范和安全，保证被校验类的方法在运行时不会做出危害虚拟机的事情，其实就是一个安全检查</p>
+</li>
+<li><p>准备：为static变量(静态变量)在方法区中分配内存空间，设置变量的初始值。例如static int a = 3 (注意：准备阶段只设置类中的静态变量（方法区中），不包括实例变量（堆内存中），实例变量是对象初始化时赋值的)。</p>
+<p><b style="color:red">注意</b>：类变量所使用的内存都应当在方法区中进行分配的。不过需要注意的是：JDK1.7之前，HotSpot使用永久代来实现方法区的时候，类变量(静态变量)，字符串常量池都是存放在永久代中的。而在JDK1.7及之后，HotSpot已经把永久代移除了，把原先放在永久代中的字符串常量池、静态变量移动到堆中，这个时候类变量则会跟随Class对象一起存放在Java堆中。</p>
+<p>准备阶段所设置的初始值”通常情况”下是数据类型默认的零值（如0、0L、null、false等），比如我们定义了<font color="Orange">public static int value = 1</font>，那么value变量在准备阶段的初始值就是0，而不是1（初始化阶段才会赋值）。<b style="color:red">特殊情况</b>：比如给value变量加上了final关键字，变成<font color="Orange">public static final int value = 1</font>；那么准备阶段的时候value的值就被赋值为1。</p>
+<p><img src="/mdimages/image-20210716143746833.png" alt="image-20210716143746833"></p>
+</li>
+<li><p>解析：虚拟机将常量池内的符合引用替换成直接引用的过程（符号引用比如import.java.util.ArrayList这就算符号引用，直接引用就是指针或者对象地址，注意引用对象一定是在内存中进行的）</p>
+</li>
+</ul>
+</li>
+<li><p>初始化</p>
+<p>初始化就是执行类构造器方法的&lt;clinit&gt;()的过程，而且要保证执行前父类的类构造器方法的&lt;clinit&gt;()方法执行完毕。这个方法是编译之后自动生成的，顺序执行所有类变量（static修饰的成员变量）显示初始化和静态代码块中的语句。此时准备阶段时的那个 static int a 由默认初始化的0变成了显示初始化的3，由于执行顺序的原因，初始化阶段类变量如果在静态代码块中又进行了更改，会覆盖类变量的显示初始化，最终值会是静态代码块中的赋值。</p>
+</li>
+<li><p>卸载</p>
+<p>卸载类即该类的Class对象被GC。</p>
+<p>卸载类需要满足3个要求：</p>
+<ul>
+<li><p>该类的所有实例对象都已被GC，也就是说堆中不存在该类的实例对象。</p>
+</li>
+<li><p>该类没有在其他任何地方被引用</p>
+</li>
+<li><p>该类的类加载器的实例已被GC</p>
+</li>
+</ul>
+<p>在JVM生命周期内，由JVM自带的类加载器加载的类是不会被卸载的，但是由我们自定义的类加载器加载的类是可能被卸载的。</p>
+</li>
+</ol>
+
+        <h3 id="内置的类加载器"   >
+          <a href="#内置的类加载器" class="heading-link"><i class="fas fa-link"></i></a><a href="#内置的类加载器" class="headerlink" title="内置的类加载器"></a>内置的类加载器</h3>
+      <p>JVM中内置了三个重要的ClassLoader，除了BootstrapClassLoader其他类加载器均由Java实现且全部继承自<font color="Orange">java.lang.ClassLoader</font>:</p>
+<ol>
+<li><b>BootstrapClassLoader(启动类加载器)</b>：最顶层的加载类，由C++实现，负责加载<font color="Orange">%JAVA_HOME%/lib</font>目录下的jar包和类或者被<font color="Orange">-Xbootclasspath</font>参数指定的路径中的所有类。</li>
+<li><b>ExtensionClassLoader(扩展类加载器)</b>：主要负责加载目录<font color="Orange">%JRE_HOME%/lib/ext</font>目录下的jar包和类，或被<font color="Orange">java.ext.dirs</font>系统变量所指定的路径下的jar包。</li>
+<li><b>AppClassLoader(应用程序类加载器)</b>：面向用户的加载器，负责加载当前应用程序<font color="Orange">classpath</font>下的所有jar包和类。</li>
+</ol>
+
+        <h3 id="类加载器的加载顺序"   >
+          <a href="#类加载器的加载顺序" class="heading-link"><i class="fas fa-link"></i></a><a href="#类加载器的加载顺序" class="headerlink" title="类加载器的加载顺序"></a>类加载器的加载顺序</h3>
+      <p>加载一个Class类的顺序也是有优先级的，类加载器从最顶层开始往下的顺序是：</p>
+<ol>
+<li>BootStrap ClassLoader：rt.jar</li>
+<li>Extension ClassLoader：加载扩展的jar包</li>
+<li>App ClassLoader：指定的classpath下面的jar包</li>
+<li>User Defined ClassLoader：自定义的类加载器</li>
+</ol>
+
+        <h3 id="双亲委派机制"   >
+          <a href="#双亲委派机制" class="heading-link"><i class="fas fa-link"></i></a><a href="#双亲委派机制" class="headerlink" title="双亲委派机制"></a>双亲委派机制</h3>
+      
+        <h4 id="概念"   >
+          <a href="#概念" class="heading-link"><i class="fas fa-link"></i></a><a href="#概念" class="headerlink" title="概念"></a>概念</h4>
+      <p>每一个类都有一个对应它的类加载器。系统中的ClassLoder在协同工作的时候会默认使用<b style="color:red">双亲委派机制</b>。即在类加载的时候，系统会首先判断当前类是否被加载过，已经被加载过的类直接返回，否则才会尝试加载。加载的时候，首先会把该请求委派该父类加载器的<font color="orange">loadClass()</font>处理，因此所有的请求最终都应该传送到顶层的启动类加载器<font color="orange">BootstrapClassLoader</font>中。当父类加载器无法处理时，才由自己处理，当父类加载器为null时，会使用启动类加载器<font color="orange">BootstrapClassLoader</font>作为父类加载器。</p>
+<p><img src="/mdimages/image-20210716152336873.png" alt="image-20210716152336873"></p>
+<p>当一个类收到了加载请求时，它是不会先自己去尝试加载的，而是委派给父类去完成。</p>
+<p>比如，new了一个Person，这个Person是自定义的类，如果我们要加载它，就会先委派<font color="orange">App ClassLoader</font>的父类<font color="orange">Extension ClassLoader</font>去尝试加载Person类，如果<font color="orange">Extension ClassLoader</font>可以完成这个请求，那么则由它负责加载类，如果不能完成该请求（也就是父类加载器都没有找到记载所需的Class）时，那么将继续委派给顶层<font color="orange">BootstrapClassLoader</font>去尝试加载，只有当父类加载器都反馈无法完成这个请求时，子类加载器才会自行尝试加载。</p>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClassLoaderDemo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;ClassLoaderDemo的类加载器是：&quot;</span> + ClassLoaderDemo.class.getClassLoader());</span><br><span class="line">        System.out.println(<span class="string">&quot;ClassLoaderDemo的父类加载器是：&quot;</span> + ClassLoaderDemo.class.getClassLoader().getParent());</span><br><span class="line">        System.out.println(<span class="string">&quot;ClassLoaderDemo的父类的父类加载器是：&quot;</span> + ClassLoaderDemo.class.getClassLoader().getParent().getParent());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+
+<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line">输出结果</span><br><span class="line">ClassLoaderDemo的类加载器是：sun.misc.Launcher$AppClassLoader@18b4aac2</span><br><span class="line">ClassLoaderDemo的父类加载器是：sun.misc.Launcher$ExtClassLoader@4554617c</span><br><span class="line">ClassLoaderDemo的父类的父类加载器是：<span class="keyword">null</span></span><br><span class="line"></span><br><span class="line">Process finished with exit code <span class="number">0</span></span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+
+<p>可以看出<font color="orange">App ClassLoader</font>的父类加载器是<font color="orange">Extension ClassLoader</font>，而<font color="orange">Extension ClassLoader</font>的父类加载器为null，<b>null并不代表</b><font color="orange">Extension ClassLoader</font><b>没有父类加载器</b>，而是<font color="orange">BootstrapClassLoader</font>。</p>
+<p><img src="/mdimages/image-20210716182038906.png" alt="image-20210716182038906"></p>
+<p><b style="color:red">注意</b>：类加载器之间的”父子”关系不是通过继承来体现的，是由”优先级”来决定的。</p>
+
+        <h4 id="双亲委派机制的好处"   >
+          <a href="#双亲委派机制的好处" class="heading-link"><i class="fas fa-link"></i></a><a href="#双亲委派机制的好处" class="headerlink" title="双亲委派机制的好处"></a>双亲委派机制的好处</h4>
+      <p>双亲委派机制保证了Java程序的稳定运行，可以避免类的重复加载（JVM区分不同类的方式不仅仅根据类名，相同的类文件被不同的类加载器加载产生的是两个不同的类），也保证了Java的核心API不被篡改。</p>
+<p>比如加载位于rt.jar包中的类时不管是哪个类加载器加载的，最终都会委托到<font color="orange">BootstrapClassLoader</font>进行加载，保证使用了不同的类加载器得到的都是同一个结果。</p>
+<p>假如没有使用双亲委派机制的话，既是每个类加载器加载自己的话就会出现问题了，比如我们自己定义了一个<font color="orange">java.lang.Object</font>类，那么程序运行的时候，系统就会出现多个不同的<font color="orange">Object</font>类。</p>
+
+        <h3 id="如何不使用双亲委派机制"   >
+          <a href="#如何不使用双亲委派机制" class="heading-link"><i class="fas fa-link"></i></a><a href="#如何不使用双亲委派机制" class="headerlink" title="如何不使用双亲委派机制"></a>如何不使用双亲委派机制</h3>
+      <p>自定义类加载器，需要继承<font color="orange">ClassLoader</font>类。如果不想打破双亲委派机制，就重写<font color="orange">ClassLoader</font>类中的<font color="orange">findClass()</font>方法即可，无法被父类加载器加载的类最终会通过这个方法被加载。但是，如果想打破双亲委派机制则需要重写<font color="orange">loadClass()</font>方法。</p>
+
+        <h3 id="自定义类加载器"   >
+          <a href="#自定义类加载器" class="heading-link"><i class="fas fa-link"></i></a><a href="#自定义类加载器" class="headerlink" title="自定义类加载器"></a>自定义类加载器</h3>
+      <p>除了<font color="orange">BootstrapClassLoader</font>其他类加载器均由Java实现且全部继承自<font color="orange">java.lang.ClassLoader</font>。</p>
+<p>如果需要自定义自己的类加载器，则需要继承<font color="orange">java.lang.ClassLoader</font>类。</p>
+
+        <h3 id="知识补充"   >
+          <a href="#知识补充" class="heading-link"><i class="fas fa-link"></i></a><a href="#知识补充" class="headerlink" title="知识补充"></a>知识补充</h3>
+      
+        <h4 id="lt-clinit-gt-初始化-静态方法"   >
+          <a href="#lt-clinit-gt-初始化-静态方法" class="heading-link"><i class="fas fa-link"></i></a><a href="#lt-clinit-gt-初始化-静态方法" class="headerlink" title="&lt;clinit&gt;初始化/静态方法"></a>&lt;clinit&gt;初始化/静态方法</h4>
+      <p>类型初始化方法主要是对static变量进行初始化操作，对static变量和static代码块初始化的逻辑全部封装在&lt;clinit&gt;方法中。</p>
+<p>java.lang.Class.forName(String name, boolean initialize, ClassLoader loader) ，第二个参数就是是否需要初始化。</p>
+<p><img src="/mdimages/image-20210716174241666.png" alt="image-20210716174241666"></p>
+<p>Java类型初始化过程中对static变量的初始化操作依赖于static变量和static代码块的前后关系，static变量与static代码块申明的位置关系会导致java编译器生成&lt;clinit&gt;方法字节码。</p>
+<p>类型的初始化方法&lt;clinit&gt;方法只在该类型被加载时才执行，且只执行一次。</p>
+
+        <h4 id="对象实例化方法-lt-init-gt"   >
+          <a href="#对象实例化方法-lt-init-gt" class="heading-link"><i class="fas fa-link"></i></a><a href="#对象实例化方法-lt-init-gt" class="headerlink" title="对象实例化方法&lt;init&gt;"></a>对象实例化方法&lt;init&gt;</h4>
+      <p>Java对象在被创建时，会进行实例化操作，该部分操作封装在&lt;init&gt;方法中，并且子类的&lt;init&gt;方法中会首先对父类的&lt;init&gt;方法调用。</p>
+
+        <h4 id="init和clinit区别"   >
+          <a href="#init和clinit区别" class="heading-link"><i class="fas fa-link"></i></a><a href="#init和clinit区别" class="headerlink" title="init和clinit区别"></a>init和clinit区别</h4>
+      <ul>
+<li><p>init和clinit方法执行时机不同</p>
+<p>init是对象构造器方法，也就是在程序执行new对象调用该对象类的constructor构造方法时才会执行init方法，而clinit是类构造器方法，是JVM进行类加载的时候，初始化阶段jvm会调用clinit方法。</p>
+</li>
+<li><p>init和clinit方法执行目的不同</p>
+</li>
+</ul>
+<p>init是instance实例构造器，对非静态变量解析初始化，而clinit是class类构造器对静态变量，静态代码块进行初始化。</p>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">X</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line">   <span class="keyword">static</span> Log log = LogFactory.getLog(); <span class="comment">// &lt;clinit&gt;</span></span><br><span class="line"> </span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">int</span> x = <span class="number">1</span>;   <span class="comment">// &lt;init&gt;</span></span><br><span class="line"> </span><br><span class="line">   X()&#123;</span><br><span class="line">      <span class="comment">// &lt;init&gt;</span></span><br><span class="line">   &#125;</span><br><span class="line">  &#123;</span><br><span class="line">     <span class="comment">// &lt;init&gt;</span></span><br><span class="line">   &#125;</span><br><span class="line"> </span><br><span class="line">   <span class="keyword">static</span> &#123;</span><br><span class="line">      <span class="comment">// &lt;clinit&gt;</span></span><br><span class="line">   &#125;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+
+<p>clinit一定优先于init。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+      </tags>
+  </entry>
 </search>
