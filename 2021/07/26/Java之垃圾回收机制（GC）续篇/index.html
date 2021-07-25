@@ -1,0 +1,604 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.6.2" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.6.2" type="image/png" sizes="32x32"><meta name="description" content="如何选择垃圾收集器       组合的选择  单CPU或小内存，单机程序 -XX:+UseSerialGC  多CPU，需要最大吞吐量，如后台计算型应用 -XX:+UseParallelGC 或者 -XX:+UseParallelOldGC  多CPU，追求低停顿时间，需要快速响应如互联网应用 -XX:+UseConcMarkSweepGC -XX:+ParNewGC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java之垃圾回收机制（GC）续篇">
+<meta property="og:url" content="http://example.com/2021/07/26/Java%E4%B9%8B%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%EF%BC%88GC%EF%BC%89%E7%BB%AD%E7%AF%87/index.html">
+<meta property="og:site_name" content="Clown&#39;s bolg">
+<meta property="og:description" content="如何选择垃圾收集器       组合的选择  单CPU或小内存，单机程序 -XX:+UseSerialGC  多CPU，需要最大吞吐量，如后台计算型应用 -XX:+UseParallelGC 或者 -XX:+UseParallelOldGC  多CPU，追求低停顿时间，需要快速响应如互联网应用 -XX:+UseConcMarkSweepGC -XX:+ParNewGC">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/mdimages/image-20210720224640083.png">
+<meta property="og:image" content="http://example.com/mdimages/image-20210724120444385.png">
+<meta property="og:image" content="http://example.com/mdimages/image-20210724122246257.png">
+<meta property="article:published_time" content="2021-07-25T16:42:15.000Z">
+<meta property="article:modified_time" content="2021-07-25T16:44:43.043Z">
+<meta property="article:author" content="Clown">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/mdimages/image-20210720224640083.png"><title>Java之垃圾回收机制（GC）续篇 | Clown's bolg</title><link ref="canonical" href="http://example.com/2021/07/26/Java%E4%B9%8B%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%EF%BC%88GC%EF%BC%89%E7%BB%AD%E7%AF%87/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.6.2"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":false},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: true,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: {"avoidBanner":false},
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.4.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Clown's bolg</div><div class="header-banner-info__subtitle"></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">Java之垃圾回收机制（GC）续篇</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2021-07-26</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-07-26</span></span><span class="post-meta-item post-meta-item--visitors"><span class="post-meta-item__icon"><i class="fas fa-eye"></i></span><span class="post-meta-item__info">阅读次数</span><span class="post-meta-item__value" id="busuanzi_value_page_pv"></span></span></div></header><div class="post-body">
+        <h3 id="如何选择垃圾收集器"   >
+          <a href="#如何选择垃圾收集器" class="heading-link"><i class="fas fa-link"></i></a><a href="#如何选择垃圾收集器" class="headerlink" title="如何选择垃圾收集器"></a>如何选择垃圾收集器</h3>
+      <p><b style= "color:orange">组合的选择</b></p>
+<ul>
+<li><p>单CPU或小内存，单机程序</p>
+<p><font color="red">-XX:+UseSerialGC</font></p>
+</li>
+<li><p>多CPU，需要最大吞吐量，如后台计算型应用</p>
+<p><font color="red">-XX:+UseParallelGC 或者 -XX:+UseParallelOldGC</font></p>
+</li>
+<li><p>多CPU，追求低停顿时间，需要快速响应如互联网应用</p>
+<p><font color="red">-XX:+UseConcMarkSweepGC</font></p>
+<p><font color="red">-XX:+ParNewGC</font></p>
+</li>
+</ul>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">参数</th>
+<th align="center">新生代垃圾收集器</th>
+<th align="center">新生代算法</th>
+<th align="center">老年代垃圾收集器</th>
+<th align="center">老年代算法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">-XX:+UseSerialGC</td>
+<td align="center">SerialGC</td>
+<td align="center">复制</td>
+<td align="center">SerialOldGC</td>
+<td align="center">标记-整理</td>
+</tr>
+<tr>
+<td align="center">-XX:+UseParNewGC</td>
+<td align="center">ParNew</td>
+<td align="center">复制</td>
+<td align="center">SerialOldGC</td>
+<td align="center">标记-整理</td>
+</tr>
+<tr>
+<td align="center">-XX:+UseParallelGC/<br/>-XX:+UseParallelOldGC</td>
+<td align="center">Parallel ScavengeGC</td>
+<td align="center">复制</td>
+<td align="center">Parallel Old</td>
+<td align="center">标记-整理</td>
+</tr>
+<tr>
+<td align="center">-XX:+UseConcMarkSweepGC</td>
+<td align="center">ParNew</td>
+<td align="center">复制</td>
+<td align="center">CMS+Serial Old的收集器组合（Serial Old 作为CMS出错的后备收集器）</td>
+<td align="center">标记-清除</td>
+</tr>
+<tr>
+<td align="center">-XX:+UseG1GC</td>
+<td align="center">G1整体上采用标记-整理算法，<br />局部是通过复制算法，不会产生内存碎片。</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody></table></div>
+<span id="more"></span>
+
+
+        <h3 id="GC的分类"   >
+          <a href="#GC的分类" class="heading-link"><i class="fas fa-link"></i></a><a href="#GC的分类" class="headerlink" title="GC的分类"></a>GC的分类</h3>
+      <p>在HotSpot VM虚拟机的实现中，它里面的GC其实准确分类只有两大种：</p>
+<p>部分收集（Partial GC）:</p>
+<ul>
+<li>新生代垃圾回收（<font color="red">Minor GC</font>/Young GC）：只对新生代进行垃圾收集；</li>
+<li>老年代垃圾回收（<font color="red">Major GC</font>/Old GC）：只对老年代进行垃圾收集。</li>
+<li>混合收集（Mixed GC）：对整个新生代和部分老年代进行垃圾收集。</li>
+</ul>
+<p>整堆收集（Full GC）:</p>
+<p>收集整个Java堆和方法区。</p>
+
+        <h3 id="新生代GC执行流程"   >
+          <a href="#新生代GC执行流程" class="heading-link"><i class="fas fa-link"></i></a><a href="#新生代GC执行流程" class="headerlink" title="新生代GC执行流程"></a>新生代GC执行流程</h3>
+      <p>JKD1.8之前堆内存分布图（JDK1.8开始及之后永久代被元空间MetaSpace取代）：</p>
+<p><img src="/mdimages/image-20210720224640083.png" alt="image-20210720224640083"></p>
+<p>新生代GC执行流程：</p>
+<p>大部分新创建的对象都是分配在Eden区中（如果对象太大，会直接分配到老年代中，可以通过配置-XX:PretenureSizeThreshold参数的值，大于该值的对象会直接进入老年代）。当Eden区满了内存不够分配的适合，就会触发一次MinorGC（新生代采用的是复制算法），将存活下来的对象复制到Survivor 0（from）区中，然后清空Eden区；当Survivor 0（from）区满后触发MinorGC，此区还存活且不满足晋升到老年代条件的对象 和 Eden区中幸存的对象都复制到Survivor 1（To）区（同样，如果存活下来的对象Survivor 1（To） 区都放不下的话，那么会通过<font color="red">分配担保机制</font>把这些新生代存活的对象直接复制到老年代中去），然后清空Eden区和Survivor 0 （From）区，同时还会把from区和to区两个指针交换（也即是from区和to区交换，始终保证to区是空的）。经过多次的Minor GC后仍然存活的对象（<b>默认是15次，可以通过配置JVM参数-XX:MaxTenuringThreshold修改</b>）会移动到老年代。老年代是存储长期存活的对象的，占满时就会触发Full GC，期间会停止所有工作线程等待GC的完成。所以对于响应要求高的应用应该尽量减少发生Full GC从而避免响应超时的问题。</p>
+<p>而且当老年区触发Full GC之后仍然无法进行对象保存操作的时候，就会产生OOM，这时候就是虚拟机中的堆内存不足，原因可能会是堆内存设置的大小过小，可以通过参数-Xms、-Xmx来调整，也可能是代码中创建的对象大且多，而且它们一直在被引用从而长时间垃圾收集无法收集它们。</p>
+
+        <h3 id="GC和Full-GC日志说明"   >
+          <a href="#GC和Full-GC日志说明" class="heading-link"><i class="fas fa-link"></i></a><a href="#GC和Full-GC日志说明" class="headerlink" title="GC和Full GC日志说明"></a>GC和Full GC日志说明</h3>
+      <p>JVM参数配置，打印GC收集信息：-XX:+PrintGCDetails</p>
+<p>Young GC</p>
+<p><img src="/mdimages/image-20210724120444385.png" alt="image-20210724120444385"></p>
+<p>Full GC</p>
+<p><img src="/mdimages/image-20210724122246257.png" alt="image-20210724122246257"></p>
+
+        <h3 id="JVM的常用参数"   >
+          <a href="#JVM的常用参数" class="heading-link"><i class="fas fa-link"></i></a><a href="#JVM的常用参数" class="headerlink" title="JVM的常用参数"></a>JVM的常用参数</h3>
+      <div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">参数</th>
+<th align="center">含义</th>
+<th align="center">默认值</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">-Xms<br />等价于-XX:InitialHeapSize</td>
+<td align="center">初始堆大小</td>
+<td align="center">物理内存的1/64</td>
+<td align="center">默认空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制<br />（可以通过MinHeapFreeRatio参数调整）</td>
+</tr>
+<tr>
+<td align="center">-Xmx<br />等价于-XX:MaxHeapSize</td>
+<td align="center">最大堆大小</td>
+<td align="center">物理内存的1/4</td>
+<td align="center">默认空余堆内存大于70%时，JVM就会减少堆直到-Xmx的最小限制<br />（可以通过MaxHeapFreeRatio参数调整）</td>
+</tr>
+<tr>
+<td align="center">-Xmn</td>
+<td align="center">年轻代大小</td>
+<td align="center"></td>
+<td align="center">注意：此处的大小是（Eden + 2 Survivor Space）<br />增大年轻代后，将会减少老年代大小，此值对系统性能影响较大<br />Sun官方推荐配置为整个堆的3/8</td>
+</tr>
+<tr>
+<td align="center">-XX:NewSize</td>
+<td align="center">设置年轻代大小</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">-XX:MaxNewSize</td>
+<td align="center">设置年轻代最大大小</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">-XX:PermSize</td>
+<td align="center">设置永久代（perm gen）初始大小</td>
+<td align="center">物理内存的1/64</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">-XX:MaxPermSize</td>
+<td align="center">设置永久代最大大小</td>
+<td align="center">物理内存的1/4</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">-Xss<br />等价于-XX:ThreadStackSize</td>
+<td align="center">设置每个线程的堆的大小</td>
+<td align="center"></td>
+<td align="center">JDK1.5以后每个线程堆栈大小为1M，以前每个线程堆栈大小为256K.根据应用的线程所需要内存大小进行调整，在相同物理内存下，减少这个值能生成更多的线程。但是操作系统对一个进程内的线程数是有限制的，不能无线生成，大概在3000<del>5000左右。<font color="red">一般默认为512K</del>1024K，这个选项对性能影响比较大，需要严格的测试，</font>。</td>
+</tr>
+<tr>
+<td align="center">-XX:NewRatio</td>
+<td align="center">设置年轻代(包括Eden区和两个Survivor区)与老年代的比值（除去永久代）</td>
+<td align="center"></td>
+<td align="center">配置年轻代与老年代在堆结构的占比，默认-XX:NewRatio=2，新生代占1，老年代占2，年轻代占整个堆的1/3。<br />-XX:NewRatio=4表示年轻代与老年代所占比值为1：4，年轻代占整个堆的1/5，<font color="red">Xms=Xmx并且设置了Xmn的情况下，该参数不需要进行配置</font>。</td>
+</tr>
+<tr>
+<td align="center">-XX:SurvivorRatio</td>
+<td align="center">设置Eden区与Survivor区的大小比值</td>
+<td align="center"></td>
+<td align="center">设置新生代中eden和S0/S1空间的比例<br/>默认-XX:SurvivorRatio=8,Eden:S0:S1=8:1:1<br/>假如-XX:SurvivorRatio=4,Eden:S0:S1=4:1:1<br/>SurvivorRatio值就是设置eden区的比例占多少，S0/S1相同</td>
+</tr>
+<tr>
+<td align="center">-XX:PretenureSizeThreshold</td>
+<td align="center">对象超过多大值直接在老年代分配</td>
+<td align="center">0（单位字节）</td>
+<td align="center">新生代采用Parallel ScavengeGC时无效，另一种直接在老年代分配的情况是大的数组对象，且数据中无外部引用对象。</td>
+</tr>
+<tr>
+<td align="center">-XX:ParallelGCThreads</td>
+<td align="center">设置并行收集器的线程数</td>
+<td align="center"></td>
+<td align="center">建议配置与处理器CPU数目相等，CMS同样。</td>
+</tr>
+<tr>
+<td align="center">-XX:MaxGCPauseMillis</td>
+<td align="center">设置每次年轻代垃圾回收的最长时间(最大暂停时间)</td>
+<td align="center"></td>
+<td align="center">如果无法满足此时间，JVM会自动调整年轻代大小以满足此值。</td>
+</tr>
+<tr>
+<td align="center">-XX:MaxTenuringThreshold</td>
+<td align="center">控制新生代需要经历多少次GC晋升到老年代中去的最大阈值</td>
+<td align="center">默认15次</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">-XX:MetaspaceSize</td>
+<td align="center">设置元空间大小</td>
+<td align="center"></td>
+<td align="center">JDK1.7永久代，JDK1.8之后元空间；元空间的本质和永久代类似，都是对JVM规范中方法区的实现。不过元空间与永久代之间最大的区别在于：元空间并不在虚拟机中，而是使用本地内存。因此，默认情况下，元空间的大小仅受本地内存限制。</td>
+</tr>
+<tr>
+<td align="center">-XX:+PrintGCDetails</td>
+<td align="center">开启打印GC收集信息</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">-XX:+PrintFlagsInitial</td>
+<td align="center">主要查看JVM初始默认参数</td>
+<td align="center"></td>
+<td align="center">参数 = 和：=的区别：<br />= 表示初始化参数；<br />：= 表示人为修改或者JVM根据系统物理内存自行修改的参数</td>
+</tr>
+<tr>
+<td align="center">-XX:+PrintCommandLineFlags</td>
+<td align="center">打印命令行参数</td>
+<td align="center"></td>
+<td align="center">主要查看当前JVM使用什么类型的垃圾回收器</td>
+</tr>
+</tbody></table></div>
+
+        <h3 id="知识补充"   >
+          <a href="#知识补充" class="heading-link"><i class="fas fa-link"></i></a><a href="#知识补充" class="headerlink" title="知识补充"></a>知识补充</h3>
+      <p>CMS永久代调优<br>默认情况下，CMS不会对永久代进行垃圾回收，只有当永久代空间耗尽时，才会触发一次Full GC回收其中的垃圾对象。</p>
+<p>此外，可以开启-XX:+CMSPermGenSweepingEnabled标志，让永久代与老年代使用同样的方式进行垃圾回收，但是触发永久代垃圾回收的指标与老年代是相互独立的，永久代使用-XX:CMSInitiatingPermOccupancyFraction标志，当永久代空间使用率达到此标志设定的值时，就会对永久代进行一次CMS扫描，并回收其无用的对象，该参数的默认值为80%。</p>
+<p>另外，为了释放永久代中真正无用的类，包括其元数据，而不是仅仅释放少量无效的对象，应该开启-XX:+CMSClassUnloadingEnabled标志，在Java8中是默认开启的。</p>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="http://example.com">Clown</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="http://example.com/2021/07/26/Java%E4%B9%8B%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%EF%BC%88GC%EF%BC%89%E7%BB%AD%E7%AF%87/">http://example.com/2021/07/26/Java%E4%B9%8B%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%EF%BC%88GC%EF%BC%89%E7%BB%AD%E7%AF%87/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="http://example.com/tags/JVM/">JVM</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2021/07/26/volatile%E5%85%B3%E9%94%AE%E5%AD%97/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">volatile关键字</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2021/07/18/Java%E4%B9%8B%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%EF%BC%88GC%EF%BC%89/"><span class="paginator-prev__text">Java之垃圾回收机制（GC）</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-number">1.</span> <span class="toc-text">
+          如何选择垃圾收集器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GC%E7%9A%84%E5%88%86%E7%B1%BB"><span class="toc-number">2.</span> <span class="toc-text">
+          GC的分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B0%E7%94%9F%E4%BB%A3GC%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">
+          新生代GC执行流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GC%E5%92%8CFull-GC%E6%97%A5%E5%BF%97%E8%AF%B4%E6%98%8E"><span class="toc-number">4.</span> <span class="toc-text">
+          GC和Full GC日志说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JVM%E7%9A%84%E5%B8%B8%E7%94%A8%E5%8F%82%E6%95%B0"><span class="toc-number">5.</span> <span class="toc-text">
+          JVM的常用参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E8%A1%A5%E5%85%85"><span class="toc-number">6.</span> <span class="toc-text">
+          知识补充</span></a></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/icons/avatar.gif" alt="avatar"></div><p class="sidebar-ov-author__text">Persistence is a virtue</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a><a class="sidebar-ov-social-item" href="ql438809495" target="_blank" rel="noopener" data-popover="微信" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-weixin"></i></span></a><a class="sidebar-ov-social-item" href="tencent://message?uin=438809495" target="_blank" rel="noopener" data-popover="social.QQ" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-qq"></i></span></a><a class="sidebar-ov-social-item" href="mailto:438809495@qq.com" target="_blank" rel="noopener" data-popover="social.QQmail" data-popover-pos="up"><span class="sidebar-ov-social-item__icon">QQ 邮箱</span></a></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">18</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">5</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">5</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Clown</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.4.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.6.2</span></div><div class="busuanzi"><span class="busuanzi-siteuv"><span class="busuanzi-siteuv__icon"><i class="fas fa-user"></i></span><span class="busuanzi-siteuv__info">访问人数</span><span class="busuanzi-siteuv__value" id="busuanzi_value_site_uv"></span></span><span class="busuanzi-sitepv"><span class="busuanzi-siteuv__icon"><i class="fas fa-eye"></i></span><span class="busuanzi-siteuv__info">浏览总量</span><span class="busuanzi-siteuv__value" id="busuanzi_value_site_pv"></span></span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><div class="search-mask"></div><div class="search-popup"><span class="search-close"></span><div class="search-input"><input placeholder="搜索文章（支持多关键词，请用空格分隔）"></div><div class="search-results"></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script><script>function initSearch() {
+  var isXML = true;
+  var search_path = 'search.xml';
+
+  if (!search_path) {
+    search_path = 'search.xml';
+  } else if (/json$/i.test(search_path)) {
+    isXML = false;
+  }
+
+  var path = '/' + search_path;
+  $.ajax({
+    url: path,
+    dataType: isXML ? 'xml' : 'json',
+    async: true,
+    success: function (res) {
+      var datas = isXML ? $('entry', res).map(function () {
+        // 将 XML 转为 JSON
+        return {
+          title: $('title', this).text(),
+          content: $('content', this).text(),
+          url: $('url', this).text()
+        };
+      }).get() : res;
+      var $input = $('.search-input input');
+      var $result = $('.search-results');
+      // 搜索对象（标题、内容）的权重，影响显示顺序
+      var WEIGHT = { title: 100, content: 1 };
+      var searchPost = function () {
+        var searchText = $input.val().toLowerCase().trim();
+        // 根据空白字符分隔关键字
+        var keywords = searchText.split(/[\s]+/);
+        // 搜索结果
+        var matchPosts = [];
+
+        // 有多个关键字时，将原文字整个保存下来
+        if (keywords.length > 1) {
+          keywords.push(searchText);
+        }
+        // 防止未输入字符时搜索
+        if (searchText.length > 0) {
+          datas.forEach(function (data) {
+            var isMatch  = false;
+            // 没有标题的文章使用预设的 i18n 变量代替
+            var title = (data.title && data.title.trim()) || '[ 文章无标题 ]';
+            var titleLower = title && title.toLowerCase();
+            // 删除 HTML 标签 和 所有空白字符
+            var content = data.content && data.content.replace(/<[^>]+>/g, '');
+            var contentLower = content && content.toLowerCase();
+            // 删除重复的 /
+            var postURL = data.url && decodeURI(data.url).replace(/\/{2,}/g, '/');
+            // 标题中匹配到的关键词
+            var titleHitSlice = [];
+            // 内容中匹配到的关键词
+            var contentHitSlice = [];
+
+            keywords.forEach(function (keyword) {
+              /**
+              * 获取匹配的关键词的索引
+              * @param {String} keyword 要匹配的关键字
+              * @param {String} text 原文字
+              * @param {Boolean} caseSensitive 是否区分大小写
+              * @param {Number} weight 匹配对象的权重。权重大的优先显示
+              * @return {Array}
+              */
+              function getIndexByword (word, text, caseSensitive, weight) {
+                if (!word || !text) {
+                  return [];
+                };
+
+                var startIndex = 0; // 每次匹配的开始索引
+                var index = -1;     // 匹配到的索引值
+                var result = [];    // 匹配结果
+
+                if (!caseSensitive) {
+                  word = word.toLowerCase();
+                  text = text.toLowerCase();
+                }
+
+                while((index = text.indexOf(word, startIndex)) !== -1) {
+                  var hasMatch = false;
+                  // 索引位置相同的关键词，保留长度较长的
+                  titleHitSlice.forEach(function (hit) {
+                    if (hit.index === index && hit.word.length < word.length) {
+                      hit.word = word;
+                      hasMatch = true;
+                    }
+                  });
+                  startIndex = index + word.length;
+                  !hasMatch && result.push({ index: index, word: word, weight: weight });
+                }
+                return result;
+              }
+              titleHitSlice = titleHitSlice.concat(getIndexByword(keyword, titleLower, false, WEIGHT.title));
+              contentHitSlice = contentHitSlice.concat(getIndexByword(keyword, contentLower, false, WEIGHT.content));
+            });
+
+            var hitTitle = titleHitSlice.length;
+            var hitContent = contentHitSlice.length;
+
+            if (hitTitle > 0 || hitContent > 0) {
+              isMatch = true;
+            }
+            if (isMatch) {
+              ;[titleHitSlice, contentHitSlice].forEach(function (hit) {
+                // 按照匹配文字的索引的递增顺序排序
+                hit.sort(function (left, right) {
+                  return left.index - right.index;
+                });
+              });
+              /**
+              * 给文本中匹配到的关键词添加标记，从而进行高亮显示
+              * @param {String} text 原文本
+              * @param {Array} hitSlice 匹配项的索引信息
+              * @param {Number} start 开始索引
+              * @param {Number} end 结束索引
+              * @return {String}
+              */
+              function highlightKeyword (text, hitSlice, start, end) {
+                if (!text || !hitSlice || !hitSlice.length) {
+                  return;
+                }
+
+                var result = '';
+                var startIndex = start;
+                var endIndex = end;
+                hitSlice.forEach(function (hit) {
+                  if (hit.index < startIndex) {
+                    return;
+                  }
+
+                  var hitWordEnd = hit.index + hit.word.length;
+                  result += text.slice(startIndex, hit.index);
+                  result += '<b>' + text.slice(hit.index, hitWordEnd) + '</b>';
+                  startIndex = hitWordEnd;
+                });
+                result += text.slice(startIndex, endIndex);
+                return result;
+              }
+
+              var postData = {};
+              // 文章总的搜索权重
+              var postWeight = titleHitSlice.length * WEIGHT.title + contentHitSlice.length * WEIGHT.content;
+              // 标记匹配关键词后的标题
+              var postTitle = highlightKeyword(title, titleHitSlice, 0, title.length) || title;
+              // 标记匹配关键词后的内容
+              var postContent;
+              // 显示内容的长度
+              var SHOW_WORD_LENGTH = 200;
+              // 命中关键词前的字符显示长度
+              var SHOW_WORD_FRONT_LENGTH = 20;
+              var SHOW_WORD_END_LENGTH = SHOW_WORD_LENGTH - SHOW_WORD_FRONT_LENGTH;
+
+              // 截取匹配的第一个字符，前后共 200 个字符来显示
+              if (contentHitSlice.length > 0) {
+                var firstIndex = contentHitSlice[0].index;
+                var start = firstIndex > SHOW_WORD_FRONT_LENGTH ? firstIndex - SHOW_WORD_FRONT_LENGTH : 0;
+                var end = firstIndex + SHOW_WORD_END_LENGTH;
+                postContent = highlightKeyword(content, contentHitSlice, start, end);
+              } else { // 未匹配到内容，直接截取前 200 个字符来显示
+                postContent = content.slice(0, SHOW_WORD_LENGTH);
+              }
+              postData.title = postTitle;
+              postData.content = postContent;
+              postData.url = postURL;
+              postData.weight = postWeight;
+              matchPosts.push(postData);
+            }
+          });
+        }
+
+        var resultInnerHtml = '';
+        if (matchPosts.length) {
+          // 按权重递增的顺序排序，使权重大的优先显示
+          matchPosts.sort(function (left, right) {
+            return right.weight - left.weight;
+          });
+          resultInnerHtml += '<ul>';
+          matchPosts.forEach(function (post) {
+            resultInnerHtml += '<li><a class="search-results-title" href="' + post.url + '">';
+            resultInnerHtml += post.title;
+            resultInnerHtml += '</a><div class="search-results-content">';
+            resultInnerHtml += post.content;
+            resultInnerHtml += '</div></li>';
+          });
+          resultInnerHtml += '</ul>';
+        } else {
+          resultInnerHtml += '<div class="search-results-none"><i class="far fa-meh"></i></div>';
+        }
+        $result.html(resultInnerHtml);
+      };
+      $input.on('input', searchPost);
+      $input.on('keyup', function (e) {
+        if (e.keyCode === Stun.utils.codeToKeyCode('Enter')) {
+          searchPost();
+        }
+      });
+    }
+  });
+}
+
+function closeSearch () {
+  $('body').css({ overflow: 'auto' });
+  $('.search-popup').css({ display: 'none' });
+  $('.search-mask').css({ display: 'none' });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  Stun.utils.pjaxReloadLocalSearch = function () {
+    $('.header-nav-search').on('click', function (e) {
+      e.stopPropagation();
+      $('body').css('overflow', 'hidden');
+      $('.search-popup')
+        .velocity('stop')
+        .velocity('transition.expandIn', {
+          duration: 300,
+          complete: function () {
+            $('.search-popup input').focus();
+          }
+        });
+      $('.search-mask')
+        .velocity('stop')
+        .velocity('transition.fadeIn', {
+          duration: 300
+        });
+
+      initSearch();
+    });
+    $('.search-mask, .search-close').on('click', function () {
+      closeSearch();
+    });
+    $(document).on('keydown', function (e) {
+      // Escape <=> 27
+      if (e.keyCode === Stun.utils.codeToKeyCode('Escape')) {
+        closeSearch();
+      }
+    });
+  };
+
+  Stun.utils.pjaxReloadLocalSearch();
+}, false);
+
+function safeOpenUrl(url) {
+  var newTab = window.open();
+  newTab.opener = null;
+  newTab.location = url;
+}
+
+function extSearch(engine) {
+  var engines = {
+    google: 'https://www.google.com/search?q=',
+    bing: 'https://cn.bing.com/search?q=',
+    baidu: 'https://www.baidu.com/s?ie=UTF-8&wd=',
+  };
+  var host = window.location.host;
+  var query = $('.search-input input').val().toLowerCase().trim();
+  var uri = engines[engine] + query + ' site:' + host;
+
+  if (query) {
+    safeOpenUrl(uri);
+  } else {
+    Stun.utils.popAlert('warning', '请输入字符');
+  }
+}
+
+var assistSearchList = window.CONFIG.assistSearch;
+
+if (Array.isArray(assistSearchList)) {
+  assistSearchList.forEach(function (name) {
+    document.querySelector('.search-btns-item--' + name).addEventListener('click', function () {
+      extSearch(name);
+    }, false);
+  });
+}</script><script src="https://cdn.jsdelivr.net/npm/pjax@latest/pjax.min.js"></script><script>window.addEventListener('DOMContentLoaded', function () {
+  var pjax = new Pjax({"selectors":["head title","#main",".pjax-reload"],"history":true,"scrollTo":false,"scrollRestoration":false,"cacheBust":false,"debug":false,"currentUrlFullReload":false,"timeout":0});
+  // 加载进度条的计时器
+  var loadingTimer = null;
+
+  // 重置页面 Y 方向上的滚动偏移量
+  document.addEventListener('pjax:send', function () {
+    $('.header-nav-menu').removeClass('show');
+    if (CONFIG.pjax && CONFIG.pjax.avoidBanner) {
+      $('html').velocity('scroll', {
+        duration: 500,
+        offset: $('#header').height(),
+        easing: 'easeInOutCubic'
+      });
+    }
+
+    var loadingBarWidth = 20;
+    var MAX_LOADING_WIDTH = 95;
+
+    $('.loading-bar').addClass('loading');
+    $('.loading-bar__progress').css('width', loadingBarWidth + '%');
+    clearInterval(loadingTimer);
+    loadingTimer = setInterval(function () {
+      loadingBarWidth += 3;
+      if (loadingBarWidth > MAX_LOADING_WIDTH) {
+        loadingBarWidth = MAX_LOADING_WIDTH;
+      }
+      $('.loading-bar__progress').css('width', loadingBarWidth + '%');
+    }, 500);
+  }, false);
+
+  window.addEventListener('pjax:complete', function () {
+    clearInterval(loadingTimer);
+    $('.loading-bar__progress').css('width', '100%');
+    $('.loading-bar').removeClass('loading');
+    setTimeout(function () {
+      $('.loading-bar__progress').css('width', '0');
+    }, 400);
+    $('link[rel=prefetch], script[data-pjax-rm]').each(function () {
+      $(this).remove();
+    });
+    $('script[data-pjax], #pjax-reload script').each(function () {
+      $(this).parent().append($(this).remove());
+    });
+
+    if (Stun.utils.pjaxReloadBoot) {
+      Stun.utils.pjaxReloadBoot();
+    }
+    if (Stun.utils.pjaxReloadScroll) {
+      Stun.utils.pjaxReloadScroll();
+    }
+    if (Stun.utils.pjaxReloadSidebar) {
+      Stun.utils.pjaxReloadSidebar();
+    }
+    if (false) {
+      if (Stun.utils.pjaxReloadHeader) {
+        Stun.utils.pjaxReloadHeader();
+      }
+      if (Stun.utils.pjaxReloadScrollIcon) {
+        Stun.utils.pjaxReloadScrollIcon();
+      }
+      if (Stun.utils.pjaxReloadLocalSearch) {
+        Stun.utils.pjaxReloadLocalSearch();
+      }
+    }
+  }, false);
+}, false);</script><div id="pjax-reload"><script src="https://cdn.jsdelivr.net/gh/sukkaw/busuanzi@latest/bsz.pure.mini.js" async></script></div><script src="/js/utils.js?v=2.6.2"></script><script src="/js/stun-boot.js?v=2.6.2"></script><script src="/js/scroll.js?v=2.6.2"></script><script src="/js/header.js?v=2.6.2"></script><script src="/js/sidebar.js?v=2.6.2"></script><script type="application/json" src="/search.xml"></script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body></html>
