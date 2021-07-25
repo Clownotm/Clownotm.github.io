@@ -2938,7 +2938,9 @@
           <a href="#原子类" class="heading-link"><i class="fas fa-link"></i></a><a href="#原子类" class="headerlink" title="原子类"></a>原子类</h4>
       <p>所谓原子类，简单理解就是具有原子/原子操作特征的类。</p>
 <p>JDK1.5开始引入了java.util.concurrent包，简称JUC并发包，而原子类就都放在java.util.concurrent.atomic包下，如下图所示：</p>
-<p><img src="/mdimages/mage-20210725143934201.png" alt="image-20210725143934201"></p>
+<p><img src="/mdimages/image-20210725143934201.png" alt="image-20210725143934201"></p>
+<span id="more"></span>
+
 
         <h3 id="Atomic原子类的类型"   >
           <a href="#Atomic原子类的类型" class="heading-link"><i class="fas fa-link"></i></a><a href="#Atomic原子类的类型" class="headerlink" title="Atomic原子类的类型"></a>Atomic原子类的类型</h3>
