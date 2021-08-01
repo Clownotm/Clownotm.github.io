@@ -3203,4 +3203,110 @@
         <tag>Spring</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Spring AOP</title>
+    <url>/2021/08/02/Spring-AOP/</url>
+    <content><![CDATA[
+        <h3 id="AOP是什么"   >
+          <a href="#AOP是什么" class="heading-link"><i class="fas fa-link"></i></a><a href="#AOP是什么" class="headerlink" title="AOP是什么"></a>AOP是什么</h3>
+      <p>简单来讲，AOP是<font color="red">面向切面编程</font>，使用动态代理技术，实现在不修改java源代码的情况下，运行时实现方法功能的增强。</p>
+
+        <h3 id="AOP的作用和优势"   >
+          <a href="#AOP的作用和优势" class="heading-link"><i class="fas fa-link"></i></a><a href="#AOP的作用和优势" class="headerlink" title="AOP的作用和优势"></a>AOP的作用和优势</h3>
+      <p>作用：在程序运行期间，不修改源码对已有方法进行增强。</p>
+<p>优势：可以实现业务逻辑各个部分的隔离，从而使得业务逻辑各个部分的耦合性降低；提高程序的可重用性，提高开发效率。</p>
+
+        <h3 id="AOP代理"   >
+          <a href="#AOP代理" class="heading-link"><i class="fas fa-link"></i></a><a href="#AOP代理" class="headerlink" title="AOP代理"></a>AOP代理</h3>
+      <p>AOP代理可分为<font color="red">静态代理</font>和<font color="red">动态代理</font>两大类。</p>
+<span id="more"></span>
+
+<p>静态代理是指使用AOP框架提供的命令进行编译，从而在<font color="red">编译阶段</font>就可生成AOP代理类，因此也称为<font color="red">编译时增强</font>；</p>
+<p>动态代理是指在<font color="red">运行时借助JDK动态代理、CGLIB代理等在内存中”临时”生成AOP动态代理类</font>，因此也称为<font color="red">运行时增强</font>；</p>
+<p>静态代理分为：编译时织入（特殊编译器实现）、类加载时织入（特殊的类加载器实现）</p>
+<p>动态代理分为：JDK动态代理（基于接口实现）、CGLIB（基于类实现）</p>
+
+        <h3 id="AOP实现的原理"   >
+          <a href="#AOP实现的原理" class="heading-link"><i class="fas fa-link"></i></a><a href="#AOP实现的原理" class="headerlink" title="AOP实现的原理"></a>AOP实现的原理</h3>
+      <p>Spring中AOP实现的原理：使用动态代理技术</p>
+<p>在Spring中，会根据目标类是否实现了接口来决定采用哪种动态代理的方式。</p>
+<p>如果目标对象实现接口，则使用<font color="red">JDK动态代理</font>（默认）；</p>
+<p>如果目标对象没有实现接口，则使用<font color="red">CGLIB代理</font>；</p>
+<p>在Java中，从织入切面的方式上来看，存在三种织入方式：<font color="red">编译期织入、类加载期织入和运行期织入</font>。</p>
+<p>编译期织入：是指在Java编译期，采用特殊的编译器，将切面织入到Java类中；</p>
+<p>类加载期织入：是指通过特殊的类加载器，在类字节码加载到JVM时，织入切面；</p>
+<p>运行期织入：是指采用JDK动态代理或CGLIB代理的方式在运行时进行切面的织入；</p>
+
+        <h3 id="AOP核心概念"   >
+          <a href="#AOP核心概念" class="heading-link"><i class="fas fa-link"></i></a><a href="#AOP核心概念" class="headerlink" title="AOP核心概念"></a>AOP核心概念</h3>
+      <ul>
+<li><p><font color="red">Joinpoint(连接点)：</font></p>
+<p>在Spring中，连接点指的是被拦截的方法（哪些要被增强功能的方法），Spring只支持方法类型的连接点，实际上连接点还可以是字段或者构造器。</p>
+</li>
+<li><p><font color="red">Pointcut(切入点)：</font></p>
+<p>对连接点(Joinpoint)进行拦截的定义。</p>
+<p>如：@Pointcut(“execution(public int com.spring.demo.aop.service.Math.*(..))”)</p>
+<p>表示拦截Math类的所有方法，不限参数。</p>
+</li>
+<li><p><font color="red">Advice(通知)：</font></p>
+<p>所谓通知是指拦截到连接点（Joinpoint）之后所要做的事情就是通知。</p>
+<p>通知的类型：前置通知，后置通知，异常通知，最终通知，环绕通知。</p>
+</li>
+<li><p><font color="red">Target(目标对象)：</font></p>
+<p>被代理的对象。</p>
+</li>
+<li><p><font color="red">Aspect(切面)：</font></p>
+<p>切面指的是切入点（Pointcut）和通知（Advice）的结合；即切面 = 切入点 + 通知。</p>
+</li>
+<li><p><font color="red">Weaving(织入)：</font></p>
+<p>将切面（Aspect）应用到目标对象并创建代理对象的过程。Spring采用动态代理织入（运行期织入），AspectJ采用编译期织入和类装载期织入。</p>
+</li>
+<li><p><font color="red">Proxy(代理)：</font></p>
+<p>一个类被AOP织入增强后，即产生一个结果代理类。</p>
+</li>
+<li><p><font color="red">introduction(引入)：</font></p>
+<p>在不修改代码的前提下，引入可以在<font color="red">运行期</font>为类动态地添加一些方法或属性。</p>
+</li>
+<li><p><font color="red">横切关注点：</font></p>
+<p>对哪些方法进行拦截，拦截后怎么处理，这些关注点称之为横切关注点。</p>
+</li>
+</ul>
+
+        <h3 id="代码演示"   >
+          <a href="#代码演示" class="heading-link"><i class="fas fa-link"></i></a><a href="#代码演示" class="headerlink" title="代码演示"></a>代码演示</h3>
+      <p>需求说明：希望在执行方法的时候自动记录日志信息。（本次代码演示以纯注解方式实现）</p>
+<p>pom.xml中的依赖：</p>
+<figure class="highlight xml"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- spring核心包 --&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-context<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.0.2.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- spring与aspectj整合包 --&gt;</span>       </span><br><span class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-aspects<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.0.2.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">     <span class="comment">&lt;!-- junit测试包 --&gt;</span>     </span><br><span class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.12<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<p>目标类（执行业务逻辑的类）：</p>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Math</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">div</span><span class="params">(<span class="keyword">int</span> i, <span class="keyword">int</span> j)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;【业务逻辑】除法运算开始......&quot;</span>);</span><br><span class="line">        <span class="keyword">int</span> result = i / j;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+
+<p>切面类（对目标类进行增强的类）：</p>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="comment">//标明当前类是一个切面类</span></span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LogAspect</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 定义一个切入点表达式</span></span><br><span class="line"><span class="comment">     * 如果是在本类引用，直接写上方法名如：pointCut()</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Pointcut(&quot;execution(public int com.spring.demo.aop.service.Math.*(..))&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">pointCut</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 前置通知:在目标方法执行之前运行</span></span><br><span class="line"><span class="comment">     * 切入点表达式：public int com.spring.demo.aop.service.Math.div(int,int) 针对Math的div方法进行切入</span></span><br><span class="line"><span class="comment">     * public int com.spring.demo.aop.service.Math.*(..)   对Math的所有方法进行切入，并且参数不限定</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Before(&quot;pointCut()&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">logStart</span><span class="params">(JoinPoint joinPoint)</span> </span>&#123;</span><br><span class="line">        String methodName = joinPoint.getSignature().getName();</span><br><span class="line">        Object[] args = joinPoint.getArgs();</span><br><span class="line">        System.out.println(methodName + <span class="string">&quot;方法运行开始前......参数列表是：&quot;</span> + Arrays.toString(args));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 后置通知:在目标方法执行结束后运行</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@After(&quot;pointCut()&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">logEnd</span><span class="params">(JoinPoint joinPoint)</span> </span>&#123;</span><br><span class="line">        String methodName = joinPoint.getSignature().getName();</span><br><span class="line">        Object[] args = joinPoint.getArgs();</span><br><span class="line">        System.out.println(methodName + <span class="string">&quot;方法运行结束后......参数列表是：&quot;</span> + Arrays.toString(args));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 正常返回通知:在目标方法正常返回之后运行，出现异常不执行</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@AfterReturning(value = &quot;pointCut()&quot;, returning = &quot;result&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">logReturn</span><span class="params">(JoinPoint joinPoint, Object result)</span> </span>&#123;</span><br><span class="line">        String methodName = joinPoint.getSignature().getName();</span><br><span class="line">        Object[] args = joinPoint.getArgs();</span><br><span class="line">        System.out.println(methodName + <span class="string">&quot;方法运行正常结束......参数列表是：&quot;</span> + Arrays.toString(args) + <span class="string">&quot;;运行结果：&quot;</span> + result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 异常通知:在目标方法出现异常之后运行</span></span><br><span class="line"><span class="comment">     * 特别注意：  参数列表第一个参数必须是JoinPoint，否则报错</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@AfterThrowing(value = &quot;pointCut()&quot;, throwing = &quot;exception&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">logException</span><span class="params">(JoinPoint joinPoint, Exception exception)</span> </span>&#123;</span><br><span class="line">        String methodName = joinPoint.getSignature().getName();</span><br><span class="line">        Object[] args = joinPoint.getArgs();</span><br><span class="line">        System.out.println(methodName + <span class="string">&quot;方法运行异常......参数列表是：&quot;</span> + Arrays.toString(args) + <span class="string">&quot;;\n 异常信息：&quot;</span> + exception.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 环绕通知：动态代理，手动推进目标方法运行(joinPoint.procced)</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 注意：如果方法有返回值，必须要将结果返回，否则会报以下错误：</span></span><br><span class="line"><span class="comment">     * org.springframework.aop.AopInvocationException:</span></span><br><span class="line"><span class="comment">     * Null return value from advice does not match primitive return type for:</span></span><br><span class="line"><span class="comment">     * public int com.spring.demo.aop.service.Math.div(int,int)</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Around(&quot;pointCut()&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">arround</span><span class="params">(ProceedingJoinPoint proceedingJoinPoint)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;【环绕通知】环绕前......&quot;</span>);</span><br><span class="line">            Object result = proceedingJoinPoint.proceed();</span><br><span class="line">            System.out.println(<span class="string">&quot;【环绕通知】环绕后......&quot;</span>);</span><br><span class="line">            System.out.println(<span class="string">&quot;结果：&quot;</span> + result);</span><br><span class="line">            <span class="comment">//如果方法有返回值，必须返回，否则报错</span></span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable throwable) &#123;</span><br><span class="line">            String exception = Arrays.toString(throwable.getStackTrace());</span><br><span class="line">            System.out.println(<span class="string">&quot;【环绕通知】环绕异常......&quot;</span> + <span class="string">&quot;异常信息：&quot;</span> + exception);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;【环绕通知】环绕最终......&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+
+<p>配置类：</p>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* <span class="doctag">@Configuration</span> 表示当前类是一个配置类，相当于spring的配置文件</span></span><br><span class="line"><span class="comment">* <span class="doctag">@EnableAspectJAutoProxy</span> 开启AOP自动代理</span></span><br><span class="line"><span class="comment">* <span class="doctag">@Bean</span> 向IOC容器中注入bean 相当于spring配置文件中的&lt;bean&gt;&lt;/bean&gt;标签</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableAspectJAutoProxy</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AopConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//切面类</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> LogAspect <span class="title">logAspect</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> LogAspect();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//业务逻辑类</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Math <span class="title">math</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Math();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+
+<p>测试类：</p>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestAop</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testAop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//根据指定的配置类创建Spring的IOC容器</span></span><br><span class="line">        AnnotationConfigApplicationContext applicationContext = <span class="keyword">new</span> AnnotationConfigApplicationContext(AopConfig.class);</span><br><span class="line">        Math math = applicationContext.getBean(Math.class);</span><br><span class="line">        math.div(<span class="number">4</span>,<span class="number">2</span>);</span><br><span class="line">        applicationContext.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+
+<p>运行结果：</p>
+<p><img src="/mdimages/image-20210801171055453.png" alt="image-20210801171055453"></p>
+<p>总结：</p>
+<p>@Before前置通知：在目标方法执行前执行</p>
+<p>@After最终通知：无论目标方法正常返回，还是发生异常都会执行</p>
+<p>@AfterReturning后置通知：在目标方法正常返回后执行，<font color="red">它和异常通知只能执行一个</font></p>
+<p>@AfterThrowing异常通知：在目标方法发生异常后执行，<font color="red">它和后置通知只能执行一个</font></p>
+<p>@Around环绕通知：环绕目标方法执行</p>
+<p>除去环绕通知以外，其它通知的执行顺序可以借鉴java中的try-catch-finally来理解：如下</p>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">   【前置通知】<span class="meta">@Before</span></span><br><span class="line">    执行目标对象方法</span><br><span class="line">   【后置通知】<span class="meta">@AfterReturning</span></span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">   【异常通知】<span class="meta">@AfterThrowing</span></span><br><span class="line">&#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">   【最终通知】<span class="meta">@After</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+
+]]></content>
+      <categories>
+        <category>Spring</category>
+      </categories>
+      <tags>
+        <tag>Spring</tag>
+      </tags>
+  </entry>
 </search>
