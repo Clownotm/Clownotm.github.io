@@ -28,8 +28,7 @@ var CONFIG = {
   sourcePath: {"js":"js","css":"css","images":"images"},
 };
 
-window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.4.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Clown's bolg</div><div class="header-banner-info__subtitle"></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content content-home" id="content"><section class="postlist"><article class="postlist-item post"><header class="post-header"><h1 class="post-title"><a class="post-title__link" href="/2021/10/30/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁</a></h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2021-10-30</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-12-15</span></span></div></header><div class="post-body"><div class="post-excerpt">
-        <h3 id="分布式锁是什么"   >
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.4.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Clown's bolg</div><div class="header-banner-info__subtitle"></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content content-home" id="content"><section class="postlist"><article class="postlist-item post"><header class="post-header"><h1 class="post-title"><a class="post-title__link" href="/2021/10/30/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁</a></h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2021-10-30</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-12-15</span></span></div></header><div class="post-body"><div class="post-excerpt"><h3 id="分布式锁是什么"   >
           <a href="#分布式锁是什么" class="heading-link"><i class="fas fa-link"></i></a><a href="#分布式锁是什么" class="headerlink" title="分布式锁是什么"></a>分布式锁是什么</h3>
       <p>分布式锁，是控制分布式系统之间同步访问共享资源的一种方式。</p>
 
@@ -38,115 +37,7 @@ window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.4.0"></he
       <p>在开发应用的时候，如果需要对某一个共享变量进行多线程同步访问的时候，可以使用java多线程的各自锁机制来进行处理（如synchronized,Lock等），但是注意这是单机应用的情况下，也就是所有的请求都会分配到当前服务器的JVM内部，然后映射为操作系统的线程进行处理，而这个共享变量只是在这个JVM内部的一块内存空间。</p>
 <p>随着业务的发展，需要做集群，一个应用需要部署到几台机器上然后做负载均衡，如下图：</p>
 <p><img src="/mdimages/image-20211207231934663.png" alt="image-20211207231934663"></p>
-<p>从上图可以看出，变量A分别在JVM1、JVM2、JVM3三个JVM内存中（变量A主要体现是在一个类中的一个成员变量），如果不加任何控制的话，变量A同时都会在JVM分配一块内存，三个请求发过来同时对这个变量操作，那么将会导致结果不正确，即使不是同时发过来，三个请求分别操作三个不同JVM内存区域的数据，变量A之间不存在共享性，也不具有可见性，处理的结果也是不对的。</p>
-<p>为了保证一个方法或属性在高并发情况下的同一时间只能被同一个线程执行，在传统单体应用单机部署的情况下，可以使用Java并发处理包（JUC）相关的API（如ReentrantLock或关键字Synchronized）进行互斥控制。但是随着业务发展，原单机部署的系统演变成分布式集群系统后，由于分布式系统多线程、多进程并且分布在不同机器上，这将使原单机部署情况下的并发控制锁策略失效，单单Java提供的并发控制API已经没法处理，为了解决这个问题就需要一种跨JVM的互斥机制来控制共享资源的访问，这就是分布式锁要解决的问题。</p>
-
-        <h3 id="分布式锁应该具备哪些条件"   >
-          <a href="#分布式锁应该具备哪些条件" class="heading-link"><i class="fas fa-link"></i></a><a href="#分布式锁应该具备哪些条件" class="headerlink" title="分布式锁应该具备哪些条件"></a>分布式锁应该具备哪些条件</h3>
-      <ol>
-<li>在分布式系统环境下，一个方法在同一时刻只能被一个机器的一个线程执行；</li>
-<li>高可用的获取锁与释放锁；</li>
-<li>高性能的获取锁与释放锁；</li>
-<li>具备可重入性；</li>
-<li>具备锁失效机制，防止死锁；</li>
-<li>具备非阻塞锁特性，即没有获取到锁将直接返回获取锁失败。</li>
-</ol>
-
-        <h3 id="分布式锁的三种实现方式"   >
-          <a href="#分布式锁的三种实现方式" class="heading-link"><i class="fas fa-link"></i></a><a href="#分布式锁的三种实现方式" class="headerlink" title="分布式锁的三种实现方式"></a>分布式锁的三种实现方式</h3>
-      
-        <h4 id="基于数据库的实现方式"   >
-          <a href="#基于数据库的实现方式" class="heading-link"><i class="fas fa-link"></i></a><a href="#基于数据库的实现方式" class="headerlink" title="基于数据库的实现方式*"></a>基于数据库的实现方式*</h4>
-      <p>基于数据库的实现方式的核心思想是：在数据库中创建一张表，表中包含方法名等字段，并在方法名字段上创建唯一索引，想要执行某个方法，就使用这个方法名向表中插入数据，成功插入则表示获取到锁，执行完成后删除对应的行数据释放锁。</p>
-<ul>
-<li><p>创建一张表</p>
-<figure class="highlight sql"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> `method_lock`;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `method_lock` (</span><br><span class="line">  `id` <span class="type">int</span>(<span class="number">11</span>) unsigned <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;主键&#x27;</span>,</span><br><span class="line">  `method_name` <span class="type">varchar</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> COMMENT <span class="string">&#x27;锁定的方法名&#x27;</span>,</span><br><span class="line">  `<span class="keyword">desc</span>` <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> COMMENT <span class="string">&#x27;备注信息&#x27;</span>,</span><br><span class="line">  `update_time` <span class="type">timestamp</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> <span class="keyword">ON</span> UPDATE <span class="built_in">CURRENT_TIMESTAMP</span>,</span><br><span class="line">  <span class="keyword">PRIMARY</span> KEY (`id`),</span><br><span class="line">  <span class="keyword">UNIQUE</span> KEY `uidx_method_name` (`method_name`) <span class="keyword">USING</span> BTREE</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB AUTO_INCREMENT<span class="operator">=</span><span class="number">3</span> <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;锁定中的方法&#x27;</span>;</span><br><span class="line"></span><br></pre></td></tr></table></div></figure></li>
-<li><p>想要执行某个方法，就要使用这个方法名向表中插入数据：</p>
-<figure class="highlight sql"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> method_lock (method_name, <span class="keyword">desc</span>) <span class="keyword">VALUES</span> (<span class="string">&#x27;methodName&#x27;</span>, <span class="string">&#x27;测试的methodName&#x27;</span>);</span><br></pre></td></tr></table></div></figure>
-
-<p>因为我们对method_name做了唯一性约束，这里如果有多个请求同时提交到数据库的话，数据库会保证只有一个操作可以成功，那么我们就可以认为操作成功的那个线程获得了该方法的锁，可以执行方法内容。</p>
-</li>
-<li><p>成功插入获取锁，执行完成后必须删除对应的行数据来释放锁：</p>
-<figure class="highlight sql"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> <span class="keyword">from</span> method_lock <span class="keyword">where</span> method_name <span class="operator">=</span><span class="string">&#x27;methodName&#x27;</span>;</span><br></pre></td></tr></table></div></figure></li>
-</ul>
-<p><b>数据库锁方法的问题</b></p>
-<figure class="highlight tex"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1、因为是基于数据库实现的，数据库的可用性和性能将直接影响分布式锁的可用性及性能，所以，数据库需要双机部署、数据同步、主备切换；</span><br><span class="line">2、不具备可重入的特性，因为同一个线程在释放锁之前，行数据一直存在，无法再次成功插入数据，所以，需要在表中新增一列，用于记录当前获取锁的机器和线程信息，在再次获取锁的时候，先查询表中机器和线程信息是否和当前机器和线程相同，若相同则直接获取锁；</span><br><span class="line">3、没有锁失效机制，因为有可能出现插入数据成功后，服务器宕机了，对应的数据没有被删除，当服务恢复后一直获取不到锁，所以，需要在表中新增一列，用于记录失效时间，并且需要有定时任务清除这些失效的数据；</span><br><span class="line">4、依赖数据库需要一定的资源开销，会有一定的性能问题。</span><br></pre></td></tr></table></div></figure>
-
-
-
-
-        <h4 id="基于Redis的实现方式"   >
-          <a href="#基于Redis的实现方式" class="heading-link"><i class="fas fa-link"></i></a><a href="#基于Redis的实现方式" class="headerlink" title="基于Redis的实现方式***"></a>基于Redis的实现方式***</h4>
-      <p>Redis做分布式锁使用的命令</p>
-<ol>
-<li><p><code>setnx</code>是【SET if Not exists】(如果不存在，则SET)的简写。</p>
-<p>命令格式：SETNX key value。当且仅当键key不存在时，将键key的值设置为value，并返回1；若键key已经存在，则SETNX命令不做任何动作，并返回0。</p>
-</li>
-<li><p><code>expire</code></p>
-<p>命令格式：expire key seconds。为给定key设置过期时间，当key过期时间一到，它就会被自动删除。设置成功返回1，当key不存在或者不能为key设置过期时间时（比如在低于2.1.3版本的Redis中你尝试更新key的过期时间）返回0。</p>
-</li>
-<li><p><code>del</code></p>
-<p>命令格式：DEL key [key …]。删除指定的一个或多个key，不存在的key会被忽略，返回被删除key的数量。</p>
-</li>
-</ol>
-<p><b>实现思路</b></p>
-<ol>
-<li>获取锁的时候，使用setnx加锁，并使用expire命令为锁添加一个过期时间，超过该时间则自动释放锁，锁的value值为一个随机生成的UUID，在释放锁的时候需要进行判断value是否相同。</li>
-<li>获取锁的时候还可以设置一个获取的超时时间，若超过这个时间则放弃获取锁。</li>
-<li>释放锁的时候，通过UUID判断是不是自己的锁，若是，则执行delete进行锁释放。</li>
-</ol>
-
-        <h4 id="基于ZooKeeper的实现方式"   >
-          <a href="#基于ZooKeeper的实现方式" class="heading-link"><i class="fas fa-link"></i></a><a href="#基于ZooKeeper的实现方式" class="headerlink" title="基于ZooKeeper的实现方式***"></a>基于ZooKeeper的实现方式***</h4>
-      <p><b>排他锁（独占锁）</b></p>
-<p>排他锁（Exclusive Locks），又被称为写锁或独占锁，如果事务T1对数据对象O1加上排他锁，那么整个加锁期间，只允许事务T1对O1进行读取和更新操作，其他任何事务都不能进行读或写。</p>
-<p>定义锁：</p>
-<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/exclusive_lock/lock</span><br></pre></td></tr></table></div></figure>
-
-<p>独占锁的 Zookeeper 节点结构</p>
-<p><img src="/mdimages/image-20211208234749864.png" alt="image-20211208234749864"></p>
-<p><strong>实现方式：</strong></p>
-<p>利用 zookeeper 的同级节点的唯一性特性，在需要获取排他锁时，所有的客户端试图通过调用 create() 接口，在 <strong>/exclusive_lock</strong> 节点下创建临时子节点 <strong>/exclusive_lock/lock</strong>，最终只有一个客户端能创建成功，那么此客户端就获得了分布式锁。同时，所有没有获取到锁的客户端可以在 <strong>/exclusive_lock</strong> 节点上注册一个子节点变更的 watcher 监听事件，以便重新争取获得锁。</p>
-<p>详细的过程如下：</p>
-<ol>
-<li>多个客户端竞争创建 lock 临时节点</li>
-<li>其中某个客户端成功创建 lock 节点，其他客户端对 lock 节点设置 watcher</li>
-<li>持有锁的客户端删除 lock 节点或该客户端崩溃，由 Zookeeper 删除 lock 节点</li>
-<li>其他客户端获得 lock 节点被删除的通知</li>
-<li>重复上述4个步骤，直至无客户端在等待获取锁了</li>
-</ol>
-<p>流程图如下：</p>
-<p><img src="/mdimages/image-20211208235956782.png" alt="image-20211208235956782"></p>
-<p><b>共享锁</b></p>
-<p>共享锁（Shared Locks），又称读锁。如果事务T1对数据对象O1加上了共享锁，那么当前事务只能对O1进行读取操作，其他事务也只能对这个数据对象加共享锁，直到该数据对象上的所有共享锁都释放。</p>
-<p><b>读写锁</b></p>
-<p>读写锁包含一个读锁和写锁，操作 O1 对资源 R1 加读锁，且获得了锁，其他操作可同时对资源 R1 设置读锁，进行共享读操作。如果操作 O1 对资源 R1 加写锁，且获得了锁，其他操作再对资源 R1 设置不同类型的锁都会被阻塞。总的来说，读锁具有共享性，而写锁具有排他性。</p>
-<p>定义锁:</p>
-<figure class="highlight plaintext"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/shared_lock/[hostname]-请求类型W/R-序号</span><br></pre></td></tr></table></div></figure>
-
-<p>读写锁的 Zookeeper 节点结构：</p>
-<p><img src="/mdimages/image-20211208234020269.png" alt="image-20211208234020269"></p>
-<p>在 Zookeeper 中，由于读写锁和独占锁的节点结构不同，读写锁的客户端不用再去竞争创建 lock 节点。所以在一开始，所有的客户端都会创建自己的锁节点。如果不出意外，所有的锁节点都能被创建成功，此时锁节点结构如上图所示。之后，客户端从 Zookeeper 端获取 /shared_lock 下所有的子节点，并判断自己能否获取锁。如果客户端创建的是读锁节点，获取锁的条件（满足其中一个即可）如下</p>
-<ol>
-<li>自己创建的节点序号排在所有其他子节点前面</li>
-<li>自己创建的节点前面无写锁节点</li>
-</ol>
-<p>如果客户端创建的是写锁节点，由于写锁具有排他性。所以获取锁的条件要简单一些，只需确定自己创建的锁节点是否排在其他子节点前面即可。</p>
-<p><strong>实现方式：</strong></p>
-<p>1、客户端调用 create 方法创建类似定义锁方式的临时顺序节点。</p>
-<p>2、客户端调用 getChildren 接口来获取所有已创建的子节点列表。</p>
-<p>3、判断是否获得锁，对于读请求如果所有比自己小的子节点都是读请求或者没有比自己序号小的子节点，表明已经成功获取共享锁，同时开始执行逻辑。对于写请求，如果自己不是序号最小的子节点，那么就进入等待。</p>
-<p>4、如果没有获取到共享锁，读请求向比自己序号小的最后一个写请求节点注册 watcher 监听，写请求向比自己序号小的最后一个节点注册watcher 监听。</p>
-<p>流程图如下：</p>
-<p><img src="/mdimages/image-20211209003938964.png" alt="image-20211209003938964"></p>
-<p>实际开发过程中，可以用 curator 工具包封装的API帮助我们实现分布式锁。</p>
-<p>curator 的几种锁方案 ：</p>
-<ul>
-<li>1、<strong>InterProcessMutex</strong>：分布式可重入排它锁</li>
-<li>2、<strong>InterProcessSemaphoreMutex</strong>：分布式排它锁</li>
-<li>3、<strong>InterProcessReadWriteLock</strong>：分布式读写锁</li>
-</ul>
-</div></div></article><article class="postlist-item post"><header class="post-header"><h1 class="post-title"><a class="post-title__link" href="/2021/10/23/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E6%80%BB%E7%BB%93/">分布式事务解决方案总结</a></h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2021-10-23</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-12-07</span></span></div></header><div class="post-body"><div class="post-excerpt"><h3 id="分布式事务解决方案对比分析"   >
+<p>从上图可以看出，变量A分别在JVM1、JVM2、JVM3三个JVM内存中（变量A主要体现是在一个类中的一个成员变量），如果不加任何控制的话，变量A同时都会在JVM分配一块内存，三个请求发过来同时对这个变量操作，那么将会导致结果不正确，即使不是同时发过来，三个请求分别操作三个不同JVM内存区域的数据，变量A之间不存在共享性，也不具有可见性，处理的结果也是不对的。</p></div><div class="post-readmore"><a class="post-readmore__link" href="/2021/10/30/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/"><span class="post-readmore__text">阅读全文</span><span class="post-readmore__icon"><i class="fas fa-long-arrow-alt-right"></i></span></a></div></div></article><article class="postlist-item post"><header class="post-header"><h1 class="post-title"><a class="post-title__link" href="/2021/10/23/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E6%80%BB%E7%BB%93/">分布式事务解决方案总结</a></h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2021-10-23</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-12-07</span></span></div></header><div class="post-body"><div class="post-excerpt"><h3 id="分布式事务解决方案对比分析"   >
           <a href="#分布式事务解决方案对比分析" class="heading-link"><i class="fas fa-link"></i></a><a href="#分布式事务解决方案对比分析" class="headerlink" title="分布式事务解决方案对比分析"></a>分布式事务解决方案对比分析</h3>
       <p><b>2PC</b>最大的诟病就是一个阻塞协议。RM在执行分支事务后需要等待TM的决定，此时服务会阻塞并锁定资源。由于其阻塞机制和最差时间复杂度高，因此这种设计不能适应随着事务涉及的服务数量增加而扩展的需要，很难用于并发较高以及子事务生命周期较长的分布式服务中。（而传统的XA方案的问题在Seata中得到了解决，它通过对本地关系型数据库的分支事务的协调来驱动完成全局事务，是工作在应用层的中间件，主要优点是性能好，且不长时间占用连接资源，它以高效并且对业务0侵入的方式解决了微服务场景下面临的分布式事务问题。）</p>
 <p><b>TCC</b>,如果拿TCC事务的处理流程与传统2PC两阶段提交方案做比较，2PC通常都是在跨库的DB层面，而TCC则是在应用层的处理，需要通过业务逻辑来实现。这种分布式事务的实现方式的优势在于，可以让<b>应用自己定义数据操作的粒度，使得降低锁冲突，提高吞吐量</b>。而不足之处也很明显，就是在于对应用的侵入性非常强，业务逻辑的每个分支都需要实现try、confirm、cancel三个操作。此外，其实现难度也比较大，需要按照网络状态、系统故障等不同的失败原因实现不同的回滚策略（常见的三种异常如<b>空回滚、幂等、悬挂</b>）。</p></div><div class="post-readmore"><a class="post-readmore__link" href="/2021/10/23/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E6%80%BB%E7%BB%93/"><span class="post-readmore__text">阅读全文</span><span class="post-readmore__icon"><i class="fas fa-long-arrow-alt-right"></i></span></a></div></div></article><article class="postlist-item post"><header class="post-header"><h1 class="post-title"><a class="post-title__link" href="/2021/10/16/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E4%B9%8B%E6%9C%80%E5%A4%A7%E5%8A%AA%E5%8A%9B%E9%80%9A%E7%9F%A5/">分布式事务解决方案之最大努力通知</a></h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2021-10-16</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-12-07</span></span></div></header><div class="post-body"><div class="post-excerpt"><h3 id="什么是最大努力通知"   >
